@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Tasking is a Myth — Jonathan Brett</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stage:#141210;
+    --stage-2:#1b1815;
+    --ink:#F2EDE4;
+    --dim:#8A857B;
+    --amber:#FFB43A;
+    --red:#E5484D;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;background:var(--stage);}
+  body{font-family:'Space Grotesk',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .deck{position:relative;width:100vw;height:100vh;height:100dvh;}
+  .slide{
+    position:absolute;inset:0;
+    display:none;flex-direction:column;justify-content:center;
+    padding:9vh 7vw 14vh;
+    opacity:0;overflow-y:auto;
+  }
+  .slide.active{display:flex;animation:fadeUp .45s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){
+    .slide.active{animation:none;opacity:1;}
+    .liar-word{animation:none !important;}
+    .drawline{animation:none !important;stroke-dashoffset:0 !important;}
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--amber);margin-bottom:2.4vh;
+  }
+  .display{
+    font-family:'Anton',sans-serif;text-transform:uppercase;
+    line-height:1;letter-spacing:.005em;
+  }
+  h1.display{font-size:clamp(2.4rem,12vw,4.6rem) !important;}
+  h2.display{font-size:clamp(1.7rem,9vw,3.2rem) !important;}
+  .body{font-size:1rem;line-height:1.55;max-width:34em;}
+  .body.dim{color:var(--dim);}
+  .cite{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.62rem;color:var(--dim);
+    margin-top:4vh;padding-top:0;
+  }
+  .accent{color:var(--amber);}
+  .danger{color:var(--red);}
+
+  .frag span{display:inline-block;}
+  .frag span:nth-child(3n){transform:translateY(-.06em) rotate(-1.2deg);}
+  .frag span:nth-child(4n){transform:translateY(.07em) rotate(1deg);}
+  .frag span:nth-child(5n){transform:translateY(-.04em);}
+
+  .spotlit{background:radial-gradient(ellipse 90% 55% at 50% 42%, var(--stage-2) 0%, var(--stage) 75%);}
+  .spotlit::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 80% 45% at 50% 38%, rgba(255,180,58,.07) 0%, transparent 70%);
+  }
+  .centered{align-items:center;text-align:center;}
+  .centered .body{margin-left:auto;margin-right:auto;}
+
+  .liar-slide{background:var(--red);align-items:center;text-align:center;justify-content:center;}
+  .liar-word{
+    font-family:'Anton',sans-serif;
+    font-size:clamp(4.5rem,26vw,8rem);
+    color:var(--stage);line-height:1;
+    animation:slam .35s cubic-bezier(.2,1.4,.4,1) both;
+  }
+  @keyframes slam{from{transform:scale(1.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .liar-sub{font-family:'IBM Plex Mono',monospace;color:var(--stage);margin-top:2vh;font-size:.78rem;letter-spacing:.12em;}
+
+  .bignum{
+    font-family:'Anton',sans-serif;
+    font-size:clamp(4.5rem,26vw,8.5rem);
+    line-height:.9;color:var(--amber);
+  }
+  .bignum.danger{color:var(--red);}
+  .bignum-label{font-size:1.05rem;max-width:26em;margin-top:2.2vh;}
+
+  .fixes{display:grid;grid-template-columns:1fr;gap:3.5vh;margin-top:3vh;}
+  .fix h3{
+    font-family:'Anton',sans-serif;text-transform:uppercase;
+    font-size:1.55rem;margin-bottom:1vh;line-height:1.05;
+  }
+  .fix .fixnum{
+    font-family:'IBM Plex Mono',monospace;color:var(--amber);
+    font-size:.68rem;letter-spacing:.2em;display:block;margin-bottom:1vh;
+  }
+  .fix p{font-size:.95rem;line-height:1.5;color:var(--ink);}
+  .fix p b{color:var(--amber);font-weight:700;}
+  .fixicon{height:40px;margin-bottom:1.2vh;display:block;}
+
+  .mathrow{
+    display:grid;grid-template-columns:auto 1fr;gap:5vw;align-items:baseline;
+    padding:1.7vh 0;border-bottom:1px solid rgba(242,237,228,.12);
+  }
+  .mathrow:last-child{border-bottom:none;}
+  .mathrow .n{font-family:'Anton',sans-serif;font-size:1.9rem;color:var(--amber);min-width:4.5ch;}
+  .mathrow .t{font-size:.95rem;line-height:1.45;}
+
+  /* split stacks vertically on phone */
+  .split{display:flex;flex-direction:column;gap:3.5vh;align-items:stretch;}
+  .split .gfx{width:100%;max-width:480px;margin:0 auto;}
+  .gfx svg{width:100%;height:auto;display:block;}
+
+  .glabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.15em;fill:var(--dim);text-transform:uppercase;}
+  .glabel.on{fill:var(--amber);}
+  .glabel.bad{fill:var(--red);}
+
+  .drawline{stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.4s .3s ease forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  /* nav: tap zones + swipe */
+  .navzone{position:fixed;top:0;bottom:14vh;width:22vw;z-index:5;cursor:pointer;}
+  .navzone.left{left:0;}
+  .navzone.right{right:0;}
+  .arrow{
+    position:fixed;bottom:2.6vh;z-index:8;
+    font-family:'IBM Plex Mono',monospace;font-size:1.25rem;color:var(--dim);
+    background:rgba(20,18,16,.85);border:1px solid rgba(242,237,228,.2);
+    border-radius:999px;width:2.9rem;height:2.9rem;
+    cursor:pointer;transition:color .15s,border-color .15s;
+  }
+  .arrow:hover,.arrow:focus-visible{color:var(--amber);border-color:var(--amber);outline:none;}
+  .arrow.prev{right:calc(5vw + 3.7rem);}
+  .arrow.next{right:5vw;}
+  .counter{
+    position:fixed;bottom:3.6vh;left:5vw;z-index:8;
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--dim);letter-spacing:.15em;
+  }
+  .notesbtn{
+    position:fixed;bottom:2.6vh;left:50%;transform:translateX(-50%);z-index:8;
+    font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.18em;
+    color:var(--dim);text-transform:uppercase;
+    background:rgba(20,18,16,.85);border:1px solid rgba(242,237,228,.2);
+    border-radius:999px;padding:.7em 1.2em;cursor:pointer;
+  }
+  .notesbtn:active{color:var(--amber);border-color:var(--amber);}
+  .progress{position:fixed;bottom:0;left:0;height:3px;background:var(--amber);width:0;z-index:8;transition:width .3s ease;}
+
+  .notes{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:rgba(20,18,16,.97);
+    border-top:2px solid var(--amber);
+    padding:2.2vh 6vw 4vh;
+    max-height:60vh;overflow-y:auto;
+    transform:translateY(105%);
+    transition:transform .25s ease;
+    box-shadow:0 -20px 60px rgba(0,0,0,.5);
+  }
+  .notes.open{transform:translateY(0);}
+  .notes h4{
+    font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.25em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:1.2vh;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .notes h4 .x{cursor:pointer;font-size:1rem;color:var(--dim);padding:0 .4em;}
+  .notes p{font-size:.95rem;line-height:1.6;color:var(--ink);margin-bottom:1vh;}
+  .notes .cue{color:var(--amber);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1 TITLE -->
+  <section class="slide" data-notes="Don't linger here.  <span class='cue'>Open with:</span> 'For the next 30 minutes I'm going to ruin something most of you are proud of.'  Smile.  Set the contract: fun, but I'm coming for you.  Do NOT say the word multi-tasking yet.  Then click straight to the question.">
+    <div class="eyebrow">A talk about attention, interruptions, and real work</div>
+    <h1 class="display frag"><span>B</span><span>U</span><span>S</span><span>Y</span><span>&nbsp;</span><span>I</span><span>S</span><br>BROKEN</h1>
+    <p class="body dim" style="margin-top:3.5vh;">Where your day actually goes — and how to get it back.</p>
+    <div class="cite">JONATHAN&nbsp;&nbsp;·&nbsp;&nbsp;30 MINUTES&nbsp;&nbsp;·&nbsp;&nbsp;ONE IDEA</div>
+  </section>
+
+  <!-- 2 THE QUESTION -->
+  <section class="slide centered spotlit" data-notes="Ask it straight and wait.  Count the hands out loud: 'One, two... look at this room, full of talent.'  <span class='cue'>Push them to commit:</span> 'Don't be shy, get those hands up, own it.'  The higher the hands, the harder the next slide lands.  Do not click until the room is committed.">
+    <h2 class="display" >Quick show of hands.<br><span class="accent">Who here is good<br>at multi-tasking?</span></h2>
+    <p class="body dim" style="margin-top:4vh;">Don't be shy. Own it.</p>
+  </section>
+
+  <!-- 3 LIARS -->
+  <section class="slide liar-slide" data-notes="Click.  <span class='cue'>Say nothing for two full seconds.</span>  Let them read it.  Then: 'Said with love.  But still.'  Beat.  'And here's the thing, you're not lying to me.  You're lying to yourselves.  Because the thing you're proud of...'  <span class='cue'>Click mid-sentence into the reveal.</span>  Remember who raised their hands.  You'll need them twice more.">
+    <div class="liar-word">LIARS.</div>
+    <div class="liar-sub">(SAID WITH LOVE. BUT STILL.)</div>
+  </section>
+
+  <!-- 4 REVEAL -->
+  <section class="slide centered spotlit" data-notes="Finish the sentence as the slide lands: '...doesn't exist.'  Beat.  'Multi-tasking is a myth.  Not overrated.  Not a weak skill.  A myth.  Your brain is physically incapable of it — and for the next half hour I'm going to prove it, then show you what to do instead.'  This is the thesis moment.  <span class='cue'>Deliver it standing still, no pacing.</span>">
+    <div class="eyebrow">The thing I'm here to ruin</div>
+    <h2 class="display frag" ><span>M</span><span>U</span><span>L</span><span>T</span><span>I</span><span>-</span><span>T</span><span>A</span><span>S</span><span>K</span><span>I</span><span>N</span><span>G</span><br>IS A MYTH.</h2>
+  </section>
+
+  <!-- 4 REFRAME -->
+  <section class="slide" data-notes="The bridge from joke to science.  Point at the graphic: 'That jagged line is your attention.  It never does two things at once, it bounces.  And every bounce, that grey gap, is dead time.'  <span class='cue'>Audience translation:</span> contractors — you can't run two service calls at once, you drive between them, and the drive is unpaid.  That drive is happening inside your head every time you switch.  Students — reading while texting means re-reading the same paragraph four times.">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Here's the thing</div>
+        <h2 class="display">You're not multi-tasking.<br>You're <span class="danger">task-switching.</span><br>Badly.</h2>
+        <p class="body" style="margin-top:3.5vh;">Your brain cannot run two thinking tasks in parallel. It toggles. Drop one thread, pick up another, drop it, go back. Every toggle has a price.</p>
+      </div>
+      <div class="gfx">
+        <svg viewBox="0 0 420 300" role="img" aria-label="Attention bouncing between two tasks with switching gaps">
+          <text x="10" y="52" class="glabel">TASK A</text>
+          <text x="10" y="242" class="glabel">TASK B</text>
+          <line x1="80" y1="60" x2="410" y2="60" stroke="rgba(242,237,228,.15)" stroke-width="2"/>
+          <line x1="80" y1="250" x2="410" y2="250" stroke="rgba(242,237,228,.15)" stroke-width="2"/>
+          <path class="drawline" d="M85 60 L130 60 L150 250 L200 250 L220 60 L265 60 L285 250 L330 250 L350 60 L405 60"
+                fill="none" stroke="var(--amber)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="130" y="120" width="20" height="70" fill="rgba(229,72,77,.25)"/>
+          <rect x="200" y="120" width="20" height="70" fill="rgba(229,72,77,.25)"/>
+          <rect x="265" y="120" width="20" height="70" fill="rgba(229,72,77,.25)"/>
+          <rect x="330" y="120" width="20" height="70" fill="rgba(229,72,77,.25)"/>
+          <text x="245" y="160" class="glabel bad" text-anchor="middle">↕ DEAD TIME, EVERY SWITCH</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <section class="slide" data-notes="<span class='cue'>The 90 seconds that converts every skeptic in the room.</span>  'Don't take my word for it.  Let's run the experiment.'  Round 1: everyone spells their first name out loud, all at once — let the chaos happen, it's fun.  Easy.  Then count up, one number per letter.  Easy.  Round 2: 'Now alternate.  Letter, number, letter, number.  GO.'  <span class='cue'>Watch the room stall on the third letter.</span>  Work the crowd: 'If your name is Bob — congratulations, you're excused.  Alexandria?  Take your time.  We'll wait.'  Then land it, slowly: 'Your name is the deepest-burned pattern in your brain.  You've produced it your entire life without thinking.  And I just broke it... with counting to five.'  Pause.  'That's what switching costs.  And you paid it on the easiest task you own.  Now imagine doing that to yourself two hundred times a day.'  From this moment they're not being told — they've felt it.">
+    <div class="eyebrow">Don't take my word for it</div>
+    <h2 class="display">Let's prove it.<br><span class="accent">Right now.</span></h2>
+    <div style="margin-top:4.5vh;font-family:'IBM Plex Mono',monospace;">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2.5vw;align-items:baseline;padding:2vh 0;border-bottom:1px solid rgba(242,237,228,.12);">
+        <span class="glabel" style="font-size:.68rem;letter-spacing:.2em;color:var(--amber);">ROUND 1</span>
+        <span style="font-size:.98rem;letter-spacing:.06em;color:var(--ink);">Spell your first name out loud. Then count up — one number per letter.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2.5vw;align-items:baseline;padding:2vh 0;">
+        <span class="glabel" style="font-size:.68rem;letter-spacing:.2em;color:var(--red);">ROUND 2</span>
+        <span style="font-size:.98rem;letter-spacing:.06em;color:var(--ink);">Now alternate. Letter, number, letter, number. GO.<br><span style="color:var(--dim);font-size:.78em;">(Mike would be: M-1-I-2-K-3-E-4)</span></span>
+      </div>
+    </div>
+    <p class="body" style="margin-top:3vh;">You've spelled your name your whole life. <span class="danger">Counting to five just broke it.</span></p>
+  </section>
+
+  <!-- 5 THE 40% -->
+  <section class="slide" data-notes="Let the number breathe before you talk.  Say 'up to' out loud — it costs you nothing and makes you bulletproof.  'Not lost to laziness.  Lost to switching.'  <span class='cue'>Make it physical:</span> point at the bar.  If a tool in your shop threw away 40% of its output, it'd be in the dumpster by Friday.  <span class='cue'>If challenged on the number:</span> it comes from controlled switching-cost experiments (Rubinstein, Meyer &amp; Evans), and 40% is the upper bound the APA cites.  Even if it's 20% for you, that's a day a week.  The argument survives at half strength.">
+    <div class="split">
+      <div>
+        <div class="eyebrow">The receipt</div>
+        <div class="bignum danger">–40%</div>
+        <p class="bignum-label">Up to 40% of productive time lost to task-switching. Not to laziness. Not to skill. To <b class="accent">switching.</b></p>
+        <div class="cite">AMERICAN PSYCHOLOGICAL ASSOCIATION, 2006</div>
+      </div>
+      <div class="gfx">
+        <svg viewBox="0 0 420 260" role="img" aria-label="Bar chart comparing focused output to multi-tasking output">
+          <text x="0" y="50" class="glabel on">ONE TASK AT A TIME</text>
+          <rect x="0" y="64" width="400" height="52" rx="4" fill="var(--amber)"/>
+          <text x="385" y="97" text-anchor="end" font-family="Anton" font-size="26" fill="var(--stage)">100%</text>
+          <text x="0" y="176" class="glabel bad">"MULTI-TASKING"</text>
+          <rect x="0" y="190" width="400" height="52" rx="4" fill="rgba(242,237,228,.08)"/>
+          <rect x="0" y="190" width="240" height="52" rx="4" fill="var(--red)"/>
+          <text x="225" y="223" text-anchor="end" font-family="Anton" font-size="26" fill="var(--stage)">60%</text>
+          <text x="255" y="223" class="glabel bad">← THE PART YOU KEEP</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 STANFORD -->
+  <section class="slide" data-notes="This is the first callback — but it's <span class='cue'>spoken, never printed.</span>  Point playfully at the hand-raisers: 'Stanford studied people exactly like you.'  Land the twist: 'Multi-tasking isn't a skill you build with practice.  It's a habit that erodes the skill you actually need — focus.'  <span class='cue'>If an academic pushes on causality in Q&amp;A:</span> correct — it's correlational, heavy multi-taskers scored worse and we can't fully separate cause from effect.  Concede it cheerfully: 'Either multi-tasking makes you worse at focusing, or people who are bad at focusing multi-task more.  Neither one is a compliment.'">
+    <div class="eyebrow">It gets worse</div>
+    <h2 class="display">The people most confident in their multi-tasking<br><span class="danger">were the worst at it.</span></h2>
+    <p class="body" style="margin-top:3.5vh;">Stanford tested heavy multi-taskers against everyone else. Worse at filtering distractions. Worse at switching. Worse at remembering. Practice doesn't make perfect. It makes it worse.</p>
+    <div class="cite">OPHIR, NASS &amp; WAGNER — PNAS, 2009</div>
+  </section>
+
+  <!-- 7 23:15 -->
+  <section class="slide centered spotlit" data-notes="Tell it as a story: 'You're deep in the estimate.  Phone buzzes.  You check it — quick, ten seconds, harmless.'  Point at the ring: 'That's what the ten seconds actually costs.  Twenty-three minutes before your head is fully back where it was.'  <span class='cue'>Then ask:</span> 'How many quick checks do you do a day?'  Let them do the mental math.  Their face will change.  Click.">
+    <div class="eyebrow">One "quick check" of your phone</div>
+    <div class="gfx" style="max-width:min(56vw,240px);margin:1vh auto;">
+      <svg viewBox="0 0 220 220" role="img" aria-label="Timer showing 23 minutes 15 seconds of recovery time">
+        <circle cx="110" cy="110" r="92" fill="none" stroke="rgba(242,237,228,.1)" stroke-width="12"/>
+        <circle class="drawline" cx="110" cy="110" r="92" fill="none" stroke="var(--amber)" stroke-width="12"
+                stroke-linecap="round" stroke-dasharray="578" stroke-dashoffset="578"
+                transform="rotate(-90 110 110)" style="animation:draw 1.6s .3s ease forwards;stroke-dasharray:578;stroke-dashoffset:135;"/>
+        <text x="110" y="105" text-anchor="middle" font-family="Anton" font-size="52" fill="var(--ink)">23:15</text>
+        <text x="110" y="132" text-anchor="middle" class="glabel">TO GET YOUR HEAD BACK</text>
+      </svg>
+    </div>
+    <p class="bignum-label" style="margin-left:auto;margin-right:auto;">The average time it takes to fully return to the task you left.</p>
+    <div class="cite" style="text-align:center;">MARK, GUDITH &amp; KLOCKE — UC IRVINE, 2008</div>
+  </section>
+
+  <!-- 8 THE MATH -->
+  <section class="slide" data-notes="Walk the rows slowly, then point at the timeline: 'That's your afternoon.  The amber is you actually working.  The red is you finding your way back to where you already were.'  Land the killer line and <span class='cue'>pause after it:</span> 'And it felt like you were working the whole time.'  Contractors hear lost billable hours.  Students hear a wasted study session.  Managers hear why the deadline slipped with everyone at their desks.  <span class='cue'>If someone objects that people compensate by working faster:</span> true — the same study found exactly that.  They compensate with speed and pay for it in stress, pressure, and frustration.  That objection IS your segue to the stress slide.">
+    <div class="eyebrow">Now do the math on your day</div>
+    <div style="margin-top:.5vh;">
+      <div class="mathrow"><div class="n">8</div><div class="t">interruptions in an afternoon. Phone, ping, "got a sec?", notification.</div></div>
+      <div class="mathrow"><div class="n">×23</div><div class="t">minutes of recovery each time before you're actually back.</div></div>
+      <div class="mathrow"><div class="n" style="color:var(--red);">≈3 hrs</div><div class="t">of your best thinking — gone. And it felt like you were working the whole time.</div></div>
+    </div>
+    <div class="gfx" style="margin-top:3.5vh;">
+      <svg viewBox="0 0 800 74" role="img" aria-label="Timeline of an afternoon shredded by interruptions">
+        <text x="0" y="14" class="glabel">1:00 PM</text>
+        <text x="800" y="14" text-anchor="end" class="glabel">5:00 PM</text>
+        <rect x="0" y="26" width="70" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="70" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="116" y="26" width="60" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="176" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="222" y="26" width="42" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="264" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="310" y="26" width="76" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="386" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="432" y="26" width="38" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="470" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="516" y="26" width="58" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="574" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="620" y="26" width="40" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="660" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <rect x="706" y="26" width="48" height="26" rx="3" fill="var(--amber)"/>
+        <rect x="754" y="26" width="46" height="26" rx="3" fill="var(--red)"/>
+        <text x="0" y="70" class="glabel on">■ ACTUAL WORK</text>
+        <text x="160" y="70" class="glabel bad">■ FINDING YOUR WAY BACK</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 9 THE ILLUSION -->
+  <section class="slide" data-notes="<span class='cue'>Second hand-raise trap:</span> 'Show of hands — who's answered an email during a meeting this week?'  Hands go up.  'Interesting.  Same hands.'  Then the line: 'You weren't in the meeting AND on email.  You were absent from both.'  Switchers take longer, make more mistakes, and spend more time in transition than in work.  Busy is a feeling.  Productive is a result.">
+    <div class="eyebrow">The productivity illusion</div>
+    <h2 class="display">Busy is not<br>the same thing<br>as <span class="accent">productive.</span></h2>
+    <p class="body" style="margin-top:3.5vh;">Answering emails in a meeting isn't doing two things at once. It's doing two things badly at once. Switchers take longer, make more mistakes, and spend more time in transition than in actual work.</p>
+    <div class="cite">RUBINSTEIN, MEYER &amp; EVANS — J. EXP. PSYCHOLOGY, 2001</div>
+  </section>
+
+  <!-- 10 STRESS -->
+  <section class="slide" data-notes="Point at the spikes: 'Every one of those is a notification.  Your brain doesn't know it's just Slack.  It fires cortisol and adrenaline like it's a real threat.'  Great for a bear.  Terrible as an all-day baseline.  <span class='cue'>Connect to the feeling:</span> 'You know that fried, irritable, wheels-spinning feeling at 5pm?  That's not the workload.  That's the switching.'  Everyone in the room knows that feeling.  Let it sit.">
+    <div class="split">
+      <div>
+        <div class="eyebrow">And it's not free for your body</div>
+        <h2 class="display">Your brain treats every ping like a <span class="danger">small emergency.</span></h2>
+        <p class="body" style="margin-top:3.5vh;">Each switch releases cortisol and adrenaline. Useful for a bear attack. Terrible as an all-day baseline. That fried feeling at 5pm? That's not the workload. That's the switching.</p>
+        <div class="cite">LEVITIN — THE ORGANIZED MIND, 2014</div>
+      </div>
+      <div class="gfx">
+        <svg viewBox="0 0 420 300" role="img" aria-label="Stress hormone spikes triggered by each notification">
+          <text x="0" y="20" class="glabel bad">STRESS RESPONSE, ONE ORDINARY AFTERNOON</text>
+          <line x1="0" y1="250" x2="420" y2="250" stroke="rgba(242,237,228,.15)" stroke-width="2"/>
+          <path class="drawline" d="M0 245 L40 243 L55 130 L70 235 L110 240 L125 105 L140 230 L170 236 L185 150 L200 228 L235 232 L250 90 L265 225 L300 230 L315 140 L330 222 L365 226 L380 115 L395 220 L420 224"
+                fill="none" stroke="var(--red)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <g fill="var(--dim)" font-family="IBM Plex Mono" font-size="13">
+            <text x="48" y="278">🔔</text><text x="118" y="278">🔔</text><text x="178" y="278">🔔</text><text x="243" y="278">🔔</text><text x="308" y="278">🔔</text><text x="373" y="278">🔔</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 DEEP WORK -->
+  <section class="slide" data-notes="Point at the graphic: 'Fragmented attention bounces along the surface.  It never gets deep enough to reach the work that's actually worth money.'  <span class='cue'>Translate value per room:</span> the estimate that wins the job.  The design that saves the project.  The studying that passes the exam.  The strategy that beats the competitor.  None of it happens in five-minute windows between pings.  Depth is where your edge lives, and switching keeps you in the shallows.">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Where the value actually lives</div>
+        <h2 class="display">The work that pays only happens in <span class="accent">uninterrupted stretches.</span></h2>
+        <p class="body" style="margin-top:3.5vh;">The estimate that wins the job. The plan that saves the project. The studying that passes the exam. Fragmented attention never gets traction.</p>
+        <div class="cite">NEWPORT — DEEP WORK, 2016</div>
+      </div>
+      <div class="gfx">
+        <svg viewBox="0 0 420 320" role="img" aria-label="Fragmented attention stays shallow while sustained focus reaches deep valuable work">
+          <line x1="0" y1="40" x2="420" y2="40" stroke="rgba(242,237,228,.15)" stroke-width="2"/>
+          <text x="0" y="26" class="glabel">SURFACE</text>
+          <path d="M10 40 Q30 90 50 45 Q70 95 90 42 Q110 100 130 44 Q150 92 170 40"
+                fill="none" stroke="var(--red)" stroke-width="3.5" stroke-linecap="round"/>
+          <text x="16" y="130" class="glabel bad">SWITCHING: SHALLOW, ALWAYS</text>
+          <path class="drawline" d="M250 40 Q260 120 285 190 Q310 260 350 285"
+                fill="none" stroke="var(--amber)" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="350" cy="285" r="7" fill="var(--amber)"/>
+          <text x="415" y="295" text-anchor="end" class="glabel on">DEEP WORK: WHERE THE MONEY IS</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 PEOPLE -->
+  <section class="slide" data-notes="<span class='cue'>Slow down.  Drop the comedy.</span>  This is the sincere beat of the talk.  'Ever talked to someone typing while listening to you?  They nod in the right spots.  How valued did you feel?'  Pause.  This is where a personal story goes — the moment someone you love noticed you were half-there.  Then the line: 'Half-attention sends one message — something else matters more than you.'  On the job site.  In the meeting.  At the dinner table.">
+    <div class="eyebrow">It's not just your output</div>
+    <h2 class="display">Ever talked to someone typing while "listening"?</h2>
+    <p class="body" style="margin-top:3.5vh;">How valued did you feel? Divided attention reduces empathy, breeds misunderstandings, and erodes trust. Half-attention sends one message: <span class="accent">something else matters more than you.</span></p>
+    <div class="cite">ROSEN — IDISORDER, 2012</div>
+  </section>
+
+  <!-- 13 PIVOT -->
+  <section class="slide centered spotlit" data-notes="<span class='cue'>Energy back up.</span>  'Good news — this is completely fixable.  Focus is not a personality trait.  It's a system.  Six moves, none of them cost a dime.  I call it the Focus Six.'  Naming it matters — a named system is what they repeat to a colleague on Monday.  Click with pace from here.  The back half of the talk should feel faster than the front half.">
+    <div class="gfx" style="max-width:min(26vh,220px);margin:0 auto 2vh;">
+      <svg viewBox="0 0 220 170" role="img" aria-label="Spotlight beam on a single point">
+        <polygon points="110,6 30,150 190,150" fill="rgba(255,180,58,.12)"/>
+        <polygon points="110,6 66,150 154,150" fill="rgba(255,180,58,.18)"/>
+        <circle cx="110" cy="10" r="7" fill="var(--amber)"/>
+        <ellipse cx="110" cy="150" rx="46" ry="10" fill="var(--amber)"/>
+      </svg>
+    </div>
+    <div class="eyebrow">So what actually works?</div>
+    <h2 class="display" >ONE THING<br>AT A TIME.</h2>
+    <p class="body dim" style="margin-top:3vh;">Focus isn't a personality trait. It's a system. Six moves, zero cost. <span class="accent">The Focus Six.</span></p>
+  </section>
+
+  <!-- 14 FIXES 1-2 -->
+  <section class="slide" data-notes="<span class='cue'>Fix 01:</span> everyone says time-block.  The version that works is a SEQUENCE, not a schedule: the one thing happens BEFORE the inbox opens.  'Your best attention is a morning asset.  Email spends it on other people's priorities.'  If 90 minutes sounds impossible, start at 25 with a 5-minute break and build.  <span class='cue'>Fix 02:</span> hit the number — about 75 times a day, Gloria Mark's research at UC Irvine.  Let it land.  'You're not addicted to email.  You're addicted to switching.'  The urgent stuff finds you.  It always has.">
+    <div class="eyebrow">The Focus Six — 01 &amp; 02</div>
+    <div class="fixes">
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="6" y="10" width="52" height="46" rx="6" stroke="var(--amber)" stroke-width="3.5"/><line x1="6" y1="24" x2="58" y2="24" stroke="var(--amber)" stroke-width="3.5"/><line x1="20" y1="4" x2="20" y2="16" stroke="var(--amber)" stroke-width="3.5" stroke-linecap="round"/><line x1="44" y1="4" x2="44" y2="16" stroke="var(--amber)" stroke-width="3.5" stroke-linecap="round"/><rect x="14" y="32" width="20" height="16" rx="3" fill="var(--amber)"/></svg>
+        <span class="fixnum">FIX 01</span>
+        <h3>The First 90</h3>
+        <p>Your one thing happens <b>before the inbox opens.</b> First 90 minutes: one task, comms closed. Nothing in until the one thing is out.</p>
+      </div>
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="16" cy="32" r="7" fill="var(--amber)"/><circle cx="34" cy="32" r="7" stroke="var(--amber)" stroke-width="3.5"/><circle cx="52" cy="32" r="7" stroke="var(--amber)" stroke-width="3.5"/><path d="M10 52 h44" stroke="var(--dim)" stroke-width="3" stroke-dasharray="4 5"/></svg>
+        <span class="fixnum">FIX 02</span>
+        <h3>Three touches</h3>
+        <p>The average office worker checks email <b>about 75 times a day.</b> Check at 10, 1, and 4 instead. Same messages — 72 fewer switches.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 FIXES 3-4 -->
+  <section class="slide" data-notes="<span class='cue'>Fix 03 is THE stat of the section — slow down and let it detonate.</span>  University of Texas, 2017: people with their phone in another room significantly out-thought people with it on the desk or in their pocket.  Even POWERED OFF.  'Your phone doesn't have to buzz to beat you.  It just has to exist near you.'  Watch the room — this is the one they write down.  <span class='cue'>Fix 04:</span> name it — psychologists call it the Zeigarnik effect: open loops nag, captured loops go quiet.  'You're not resisting the thought.  You're scheduling it.'  This is the skill nobody ever taught them.">
+    <div class="eyebrow">The Focus Six — 03 &amp; 04</div>
+    <div class="fixes">
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="6" y="14" width="18" height="36" rx="4" stroke="var(--amber)" stroke-width="3.5"/><line x1="12" y1="44" x2="18" y2="44" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/><path d="M28 32 h14" stroke="var(--dim)" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><path d="M46 12 h12 v40 h-12" stroke="var(--dim)" stroke-width="3.5" stroke-linejoin="round"/><circle cx="50" cy="34" r="2.5" fill="var(--dim)"/></svg>
+        <span class="fixnum">FIX 03</span>
+        <h3>Another room</h3>
+        <p>Texas researchers found your phone <b>drains your thinking even when it's off</b> and face-down. Silent isn't enough. Off isn't enough. Another room.</p>
+      </div>
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="10" y="8" width="34" height="46" rx="4" stroke="var(--amber)" stroke-width="3.5"/><line x1="18" y1="20" x2="36" y2="20" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="30" x2="36" y2="30" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="40" x2="28" y2="40" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/><path d="M40 52 L56 36 L60 40 L44 56 L38 58 Z" fill="var(--amber)"/></svg>
+        <span class="fixnum">FIX 04</span>
+        <h3>Park it</h3>
+        <p>Paper beside you. When the itch to switch hits — an idea, a worry, a "quick" search — <b>write it down and stay.</b> Open loops nag. The note closes the loop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 FIXES 5-6 -->
+  <section class="slide" data-notes="<span class='cue'>Fix 05: people don't write down 'say no more.'  They write down WORDS.</span>  Give them the two sentences slowly, twice: 'I want to give this real attention, and I can't today.  Can I get you an answer by Thursday?'  Student version: 'I'll call you back at four.'  <span class='cue'>Fix 06:</span> deciding is itself a task — and if you decide in the morning, choosing becomes the first switch of your day.  One thing on the sticky.  'If you write three things, you wrote zero things.'  That line is quotable — hit it clean.  <span class='cue'>If someone raises the 'three things a day' school (Musk, O'Leary):</span> agree with them.  'Three things a day is a list size.  One thing at a time is how you run the list — nobody means do them simultaneously.  Musk timeboxes in five-minute blocks; that's the most extreme one-at-a-time regime in business.'  The sticky isn't the to-do list.  It answers one question: which thing gets the First 90.  Rank your three, because the day WILL shrink your list — ranking decides whether it eats number one or number three.">
+    <div class="eyebrow">The Focus Six — 05 &amp; 06</div>
+    <div class="fixes">
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 6 L54 14 L54 30 C54 45 44 54 32 58 C20 54 10 45 10 30 L10 14 Z" stroke="var(--amber)" stroke-width="3.5" stroke-linejoin="round"/><path d="M22 32 L29 39 L43 25" stroke="var(--amber)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="fixnum">FIX 05</span>
+        <h3>The two-sentence no</h3>
+        <p>Exact words: <b>"I want to give this real attention, and I can't today. Can I get you an answer by Thursday?"</b> Protecting focus isn't rude. Half-listening is.</p>
+      </div>
+      <div class="fix">
+        <svg class="fixicon" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M38 8 a20 20 0 1 0 18 28 a16 16 0 0 1 -18 -28 z" stroke="var(--dim)" stroke-width="3.5" stroke-linejoin="round"/><path d="M38 36 h18 v18 h-13 z" fill="var(--amber)"/><path d="M43 54 v-5 h13" fill="none" stroke="var(--stage)" stroke-width="2.5"/></svg>
+        <span class="fixnum">FIX 06</span>
+        <h3>Tonight's sticky</h3>
+        <p>Before you quit for the day, write tomorrow's ONE thing on a sticky. Keyboard, dashboard, toolbox. <b>Morning-you spends the beam working, not choosing.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 CHALLENGE -->
+  <section class="slide centered spotlit" data-notes="This is the ask, and it's deliberately small: 'You already know these two.  Fix 01, Fix 03.  Tomorrow you just run them.'  They know WHY another room — the Texas study did that work four slides ago, so there's no new idea here, only a commitment.  <span class='cue'>Third hand-raise, the closer:</span> 'Who's actually going to try this tomorrow?  Hands up.'  Wait for hands.  Then, warm: 'Look at that.  Hands again.  This time... I believe you.'  Callback complete.  The room will laugh and mean it.">
+    <div class="gfx" style="max-width:min(24vh,190px);margin:0 auto 2vh;">
+      <svg viewBox="0 0 200 120" role="img" aria-label="Phone placed far away from the desk">
+        <rect x="8" y="30" width="70" height="60" rx="6" stroke="var(--amber)" stroke-width="4" fill="none"/>
+        <line x1="8" y1="76" x2="78" y2="76" stroke="var(--amber)" stroke-width="4"/>
+        <path d="M90 60 L150 60" stroke="var(--dim)" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+        <rect x="158" y="42" width="24" height="42" rx="5" stroke="var(--dim)" stroke-width="3.5" fill="none"/>
+        <line x1="166" y1="78" x2="174" y2="78" stroke="var(--dim)" stroke-width="3" stroke-linecap="round"/>
+        <text x="42" y="112" text-anchor="middle" class="glabel on">YOU</text>
+        <text x="170" y="112" text-anchor="middle" class="glabel">ANOTHER ROOM</text>
+      </svg>
+    </div>
+    <div class="eyebrow">Your homework — tomorrow morning</div>
+    <h2 class="display">One task. 90 minutes.<br><span class="accent">Phone in another room.</span></h2>
+    <p class="body" style="margin-top:3vh;">Not on silent. Not face-down. <b>Another room.</b> That's Fix 01 plus Fix 03 — nothing else. Then notice how much you got done, and how it felt.</p>
+  </section>
+
+  <!-- 18 CLOSE -->
+  <section class="slide centered spotlit" data-notes="Land the line, then <span class='cue'>stop talking.</span>  'Focus is the real superpower.  Do one thing.  Fully.  Then the next.'  Don't add a word after it.  Hold the silence for three seconds, then: 'Questions.'  Resist the urge to summarize — the summary is on the screen.">
+    <h2 class="display" >FOCUS IS THE<br><span class="accent">REAL SUPERPOWER.</span></h2>
+    <p class="body dim" style="margin-top:3.5vh;">Do one thing. Fully. Then the next.</p>
+    <div class="cite" style="text-align:center;">JONATHAN BRETT&nbsp;&nbsp;·&nbsp;&nbsp;JONATHANB79@GMAIL.COM&nbsp;&nbsp;·&nbsp;&nbsp;QUESTIONS?</div>
+  </section>
+
+</div>
+
+<div class="navzone left" onclick="go(-1)" aria-hidden="true"></div>
+<div class="navzone right" onclick="go(1)" aria-hidden="true"></div>
+<button class="arrow prev" onclick="go(-1)" aria-label="Previous slide">←</button>
+<button class="arrow next" onclick="go(1)" aria-label="Next slide">→</button>
+<div class="counter" id="counter"></div>
+<button class="notesbtn" onclick="toggleNotes()">Notes</button>
+<div class="progress" id="progress"></div>
+
+<div class="notes" id="notes">
+  <h4><span id="notesTitle">SPEAKER NOTES</span><span class="x" onclick="toggleNotes()">✕</span></h4>
+  <p id="notesBody"></p>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const notesPanel=document.getElementById('notes');
+  let i=0, notesOpen=false;
+  function render(){
+    slides.forEach((s,idx)=>s.classList.toggle('active',idx===i));
+    document.getElementById('counter').textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+    document.getElementById('progress').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('notesTitle').textContent='SPEAKER NOTES — SLIDE '+String(i+1).padStart(2,'0');
+    document.getElementById('notesBody').innerHTML=slides[i].dataset.notes||'No notes for this slide.';
+    slides[i].scrollTop=0;
+  }
+  function go(d){i=Math.min(slides.length-1,Math.max(0,i+d));render();}
+  function toggleNotes(){notesOpen=!notesOpen;notesPanel.classList.toggle('open',notesOpen);}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')go(1);
+    if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1);
+    if(e.key==='Home'){i=0;render();}
+    if(e.key==='End'){i=slides.length-1;render();}
+    if(e.key==='n'||e.key==='N')toggleNotes();
+    if(e.key==='Escape'){notesOpen=false;notesPanel.classList.remove('open');}
+  });
+  let tx=0, ty=0;
+  document.addEventListener('touchstart',e=>{tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(notesOpen)return;
+    const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5) go(dx<0?1:-1);
+  },{passive:true});
+  render();
+</script>
+</body>
+</html>
