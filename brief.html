@@ -1,679 +1,735 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jonathan's Morning Brief</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&family=Archivo+Narrow:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+:root {
+  --cream: #faf6ef;
+  --cream-dk: #f0ead8;
+  --ink: #1a1410;
+  --ink-lt: #5a4e40;
+  --rule: #8b7355;
+  --red: #8b1a1a;
+  --world: #374151;
+  --world-bg: #f1f5f9;
+  --leafs: #003e7e;
+  --leafs-bg: #ebf4ff;
+  --nhl: #065f5f;
+  --nhl-bg: #ecfdf5;
+  --ai: #166534;
+  --ai-bg: #f0fdf4;
+  --hvac: #92400e;
+  --hvac-bg: #fffbeb;
+  --local: #5b21b6;
+  --local-bg: #faf5ff;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;background:#faf8f3;color:#1c1810;font-family:'Source Serif 4',Georgia,serif;}
+html,body{height:100%;overflow:hidden;background:var(--cream);color:var(--ink);}
 .app{display:flex;flex-direction:column;height:100vh;}
-.fixed-top{flex:0 0 auto;z-index:100;}
+.fixed-top{flex:0 0 auto;background:var(--cream);border-bottom:2px solid var(--rule);}
 .deck{flex:1 1 auto;position:relative;overflow:hidden;}
+.nav-footer{flex:0 0 auto;background:var(--cream-dk);border-top:2px solid var(--rule);padding:5px 16px;display:flex;align-items:center;justify-content:space-between;}
 .slide{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
 .slide.active{display:flex;}
 
 /* Masthead */
-.masthead{background:#1c1810;color:#faf8f3;padding:7px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #8b6914;}
-.mh-left{display:flex;align-items:center;gap:10px;}
-.mh-title{font-family:'Libre Caslon Display',Georgia,serif;font-size:20px;letter-spacing:.02em;}
-.mh-date{font-family:'Archivo Narrow',Arial,sans-serif;font-size:12px;color:#c9b882;letter-spacing:.05em;text-transform:uppercase;}
+.masthead{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 5px;}
+.mhead-l{display:flex;align-items:center;gap:10px;}
+.mhead-title{font-family:'Libre Caslon Display',serif;font-size:1.3rem;color:var(--red);letter-spacing:-0.3px;line-height:1;}
+.mhead-date{font-family:'Archivo Narrow',sans-serif;font-size:0.76rem;color:var(--ink-lt);margin-top:1px;}
+.mhead-r{font-family:'Archivo Narrow',sans-serif;font-size:0.73rem;color:var(--ink-lt);}
+#bin-banner{display:none;padding:7px 16px;font-family:'Archivo Narrow',sans-serif;font-size:1.05rem;font-weight:700;text-align:center;letter-spacing:0.02em;}
+#bin-banner.is-recycle{background:#1a6fa8;color:#fff;}
+#bin-banner.is-garbage{background:#2a2a2a;color:#fff;}
 
-/* Bin banner */
-#bin-banner{display:none;padding:6px 18px;font-family:'Archivo Narrow',Arial,sans-serif;font-size:15px;font-weight:600;letter-spacing:.02em;}
-#bin-banner.is-recycle{background:#1d4ed8;color:#fff;}
-#bin-banner.is-garbage{background:#374151;color:#fff;}
-
-/* Nav strip */
-.nav-strip{background:#1c1810;display:flex;align-items:center;justify-content:space-between;padding:4px 16px;border-top:1px solid #3a3020;}
-.nav-btn{background:none;border:1px solid #5a4e38;color:#c9b882;font-family:'Archivo Narrow',sans-serif;font-size:13px;padding:3px 12px;cursor:pointer;border-radius:2px;}
-.nav-btn:hover{background:#3a3020;}
+/* Nav footer */
+.nav-btn{background:none;border:1px solid var(--rule);border-radius:4px;padding:3px 14px;font-family:'Archivo Narrow',sans-serif;font-size:0.88rem;cursor:pointer;color:var(--ink);}
+.nav-btn:hover{background:var(--rule);color:#fff;}
+.nav-center{display:flex;align-items:center;gap:8px;}
 .nav-dots{display:flex;gap:6px;align-items:center;}
-.nav-dot{width:7px;height:7px;border-radius:50%;background:#5a4e38;cursor:pointer;}
-.nav-dot.active{background:#c9b882;}
-.nav-counter{font-family:'Archivo Narrow',sans-serif;font-size:12px;color:#7a6a50;}
+.nav-dot{width:9px;height:9px;border-radius:50%;background:var(--rule);opacity:0.25;cursor:pointer;transition:opacity 0.2s,background 0.2s;}
+.nav-dot.active{opacity:1;background:var(--red);}
+.nav-counter{font-family:'Archivo Narrow',sans-serif;font-size:0.77rem;color:var(--ink-lt);}
 
-/* Weather strip */
-.dash-weather{flex:0 0 auto;background:#1c1810;color:#faf8f3;padding:8px 18px;border-bottom:2px solid #8b6914;}
-.weather-now{display:flex;align-items:flex-start;gap:14px;margin-bottom:6px;}
-.w-icon{font-size:34px;line-height:1;}
-.w-temp{font-family:'Libre Caslon Display',Georgia,serif;font-size:38px;line-height:1;}
-.w-desc{font-family:'Archivo Narrow',sans-serif;font-size:14px;color:#c9b882;margin-top:2px;}
-.w-wind{font-family:'Archivo Narrow',sans-serif;font-size:13px;color:#7a6a50;margin-top:2px;}
-.w-timeline{display:flex;gap:16px;margin-left:auto;align-items:center;}
-.w-tod{font-family:'Archivo Narrow',sans-serif;font-size:13px;text-align:center;}
-.w-tod-label{font-size:10px;color:#6a5a40;text-transform:uppercase;display:block;}
-.w-tod-val{font-size:16px;color:#e8dfc0;display:block;margin-top:1px;}
-.forecast-strip{display:flex;gap:8px;}
-.fc-chip{background:#2a2015;border-radius:3px;padding:5px 10px;text-align:center;flex:1;font-family:'Archivo Narrow',sans-serif;}
-.fc-day{font-size:10px;color:#7a6a50;text-transform:uppercase;letter-spacing:.05em;}
-.fc-icon{font-size:18px;margin:2px 0;}
-.fc-temps{font-size:13px;}
-.fc-hi{color:#f5e6b0;}
-.fc-lo{color:#6a7a8a;margin-left:4px;}
-.w-loading{font-family:'Archivo Narrow',sans-serif;font-size:13px;color:#6a5a40;padding:8px 0;}
+/* Dashboard: weather strip */
+.wx-strip{flex:0 0 auto;background:var(--cream-dk);border-bottom:1px solid var(--rule);padding:9px 14px;display:flex;align-items:center;gap:10px;overflow-x:auto;}
+.wx-cur{flex:0 0 auto;display:flex;flex-direction:column;padding-right:12px;border-right:1px solid var(--rule);min-width:110px;}
+.wx-cur .wc-icon{font-size:2rem;line-height:1;}
+.wx-cur .wc-temp{font-family:'Libre Caslon Display',serif;font-size:1.7rem;color:var(--red);line-height:1.1;}
+.wx-cur .wc-desc{font-family:'Archivo Narrow',sans-serif;font-size:0.8rem;color:var(--ink-lt);}
+.wx-cur .wc-wind{font-family:'Archivo Narrow',sans-serif;font-size:0.73rem;color:var(--ink-lt);margin-top:2px;}
+.wx-period{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:0 9px;border-right:1px solid #d4c9b4;min-width:72px;}
+.wp-label{font-family:'Archivo Narrow',sans-serif;font-size:0.68rem;color:var(--ink-lt);text-transform:uppercase;letter-spacing:0.05em;}
+.wp-icon{font-size:1.35rem;}
+.wp-temp{font-family:'Source Serif 4',serif;font-size:1.05rem;font-weight:700;}
+.wp-desc{font-family:'Archivo Narrow',sans-serif;font-size:0.7rem;color:var(--ink-lt);text-align:center;}
+.fc-strip{flex:1 1 auto;display:flex;gap:5px;padding-left:10px;}
+.fc-chip{flex:1 1 0;display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.55);border-radius:6px;padding:5px 4px;min-width:62px;}
+.fc-day{font-family:'Archivo Narrow',sans-serif;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-lt);}
+.fc-icon{font-size:1.25rem;}
+.fc-temps{font-family:'Archivo Narrow',sans-serif;font-size:0.92rem;font-weight:700;}
+.fc-hi{color:var(--red);}
+.fc-lo{color:var(--ink-lt);font-weight:400;}
 
-/* Dashboard body */
-.dash-body{flex:1 1 auto;min-height:0;display:flex;overflow:hidden;}
-.dash-col{flex:1;overflow-y:auto;padding:12px 16px;}
-.dash-col:first-child{border-right:1px solid #d4c9b8;}
-.col-header{font-family:'Archivo Narrow',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8b6914;border-bottom:1px solid #d4c9b8;padding-bottom:5px;margin-bottom:10px;}
+/* Dashboard columns */
+.dash-cols{flex:1 1 auto;display:flex;min-height:0;overflow:hidden;}
+.dash-l{flex:0 0 44%;border-right:1px solid var(--rule);padding:12px 14px;overflow-y:auto;}
+.dash-r{flex:1 1 auto;padding:12px 14px;overflow-y:auto;}
+.sec-head{font-family:'Libre Caslon Display',serif;font-size:0.9rem;color:var(--red);border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.07em;}
 
 /* Action items */
-.action-item{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #e8e0d0;}
-.action-item:last-child{border-bottom:none;}
-.action-rank{font-family:'Archivo Narrow',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8b6914;margin-bottom:3px;}
-.action-title{font-size:16px;font-weight:600;line-height:1.3;margin-bottom:4px;}
-.action-title a{color:#1c1810;text-decoration:none;border-bottom:1px solid #8b6914;}
-.action-title a:hover{color:#8b6914;}
-.action-desc{font-size:15px;color:#4a3f2e;line-height:1.5;}
+.act-item{margin-bottom:13px;padding-bottom:13px;border-bottom:1px solid var(--cream-dk);}
+.act-item:last-child{border-bottom:none;margin-bottom:0;}
+.act-rank{font-family:'Archivo Narrow',sans-serif;font-size:0.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:2px;}
+.act-title{font-family:'Source Serif 4',serif;font-size:1.0rem;font-weight:700;line-height:1.25;margin-bottom:3px;}
+.act-title a{color:var(--ink);text-decoration:none;}
+.act-title a:hover{text-decoration:underline;color:var(--red);}
+.act-desc{font-family:'Archivo Narrow',sans-serif;font-size:0.9rem;color:var(--ink-lt);line-height:1.45;}
 
 /* Calendar */
-.cal-event{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
-.cal-badge{flex:0 0 42px;text-align:center;background:#f0e8d8;border-radius:3px;padding:3px 2px;font-family:'Archivo Narrow',sans-serif;}
-.cal-badge.today{background:#1c1810;}
-.cal-badge .dow{font-size:9px;text-transform:uppercase;color:#6b5f4a;display:block;}
-.cal-badge.today .dow{color:#8b6914;}
-.cal-badge .dom{font-size:17px;font-weight:700;color:#1c1810;line-height:1.1;display:block;}
-.cal-badge.today .dom{color:#faf8f3;}
-.cal-event-title{font-size:15px;font-weight:600;color:#1c1810;line-height:1.2;}
-.cal-event-meta{font-family:'Archivo Narrow',sans-serif;font-size:12px;color:#6b5f4a;margin-top:2px;}
-.cal-quiet{font-size:15px;color:#6b5f4a;font-style:italic;}
+.cal-event{display:flex;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--cream-dk);align-items:flex-start;}
+.cal-event:last-child{border-bottom:none;margin-bottom:0;}
+.cal-badge{flex:0 0 44px;text-align:center;border-radius:5px;padding:3px 4px;background:var(--red);color:#fff;}
+.cb-day{font-family:'Libre Caslon Display',serif;font-size:1.2rem;line-height:1;}
+.cb-mon{font-family:'Archivo Narrow',sans-serif;font-size:0.63rem;text-transform:uppercase;letter-spacing:0.05em;}
+.cal-info{flex:1 1 auto;}
+.ci-title{font-family:'Source Serif 4',serif;font-size:0.96rem;font-weight:700;}
+.ci-time{font-family:'Archivo Narrow',sans-serif;font-size:0.82rem;color:var(--ink-lt);}
+.ci-loc{font-family:'Archivo Narrow',sans-serif;font-size:0.75rem;color:var(--ink-lt);font-style:italic;}
+.cal-note{font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;color:var(--ink-lt);font-style:italic;margin-top:8px;}
 
-/* News slides shared */
-.news-inner{display:flex;flex-direction:column;height:100%;}
-.news-hdr{flex:0 0 auto;padding:8px 18px 7px;color:#fff;display:flex;align-items:baseline;gap:10px;}
-.news-hdr-title{font-family:'Libre Caslon Display',Georgia,serif;font-size:19px;}
-.news-hdr-sub{font-family:'Archivo Narrow',sans-serif;font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.07em;}
-.news-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:12px 18px;columns:2;column-gap:20px;}
-.news-quiet{font-size:16px;font-style:italic;color:#6b5f4a;padding:16px 0;column-span:all;}
-.story{break-inside:avoid;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,.1);}
-.story:last-child{border-bottom:none;}
-.story-date{font-family:'Archivo Narrow',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin-bottom:3px;}
-.story-title{font-size:16px;font-weight:600;line-height:1.3;margin-bottom:4px;}
-.story-title a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.2);}
-.story-title a:hover{border-bottom-color:currentColor;}
-.story-desc{font-size:14px;line-height:1.55;opacity:.85;}
+/* News slides */
+.news-head{flex:0 0 auto;padding:10px 16px;}
+.news-head h2{font-family:'Libre Caslon Display',serif;font-size:1.35rem;color:#fff;letter-spacing:0.03em;}
+.news-win{font-family:'Archivo Narrow',sans-serif;font-size:0.78rem;color:rgba(255,255,255,0.8);margin-top:1px;}
+.news-body{flex:1 1 auto;padding:13px 16px;overflow-y:auto;min-height:0;}
+.news-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.story{margin-bottom:13px;}
+.story-date{font-family:'Archivo Narrow',sans-serif;font-size:0.7rem;color:var(--ink-lt);text-transform:uppercase;letter-spacing:0.04em;}
+.story-title{font-family:'Source Serif 4',serif;font-size:0.98rem;font-weight:700;line-height:1.3;margin:2px 0 3px;}
+.story-title a{text-decoration:none;}
+.story-title a:hover{text-decoration:underline;}
+.story-desc{font-family:'Archivo Narrow',sans-serif;font-size:0.88rem;color:var(--ink-lt);line-height:1.45;}
+.story-take{font-family:'Archivo Narrow',sans-serif;font-size:0.85rem;color:var(--ink-lt);line-height:1.4;font-style:italic;margin-top:3px;}
+.story-src{font-family:'Archivo Narrow',sans-serif;font-size:0.68rem;color:var(--ink-lt);margin-top:2px;}
+.news-quiet{font-family:'Source Serif 4',serif;font-style:italic;color:var(--ink-lt);font-size:0.95rem;padding:10px 0;grid-column:1/-1;}
+.loading-msg{font-family:'Archivo Narrow',sans-serif;font-size:0.88rem;color:var(--ink-lt);padding:10px 0;grid-column:1/-1;}
 
-/* News slide color themes */
-.slide-world .news-hdr{background:#334155;}
-.slide-world .news-body{background:#f1f5f9;}
-.slide-leafs .news-hdr{background:#1a3a5c;}
-.slide-leafs .news-body{background:#eff6ff;}
-.slide-nhl .news-hdr{background:#0f4c5c;}
-.slide-nhl .news-body{background:#f0fdfa;}
-.slide-ai .news-hdr{background:#14532d;}
-.slide-ai .news-body{background:#f0fdf4;}
-.slide-hvac .news-hdr{background:#78350f;}
-.slide-hvac .news-body{background:#fffbeb;}
-.slide-local .news-hdr{background:#4a1942;}
-.slide-local .news-body{background:#fdf4ff;}
+/* Thought footer (local slide) */
+.thought-bar{flex:0 0 auto;background:var(--cream-dk);border-top:1px solid var(--rule);padding:8px 16px;display:flex;gap:16px;}
+.tb-col{flex:1 1 50%;}
+.tb-label{font-family:'Archivo Narrow',sans-serif;font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:2px;}
+.tb-text{font-family:'Source Serif 4',serif;font-size:0.88rem;font-style:italic;color:var(--ink);line-height:1.35;}
 
-/* Daily footer on local slide */
-.daily-footer{flex:0 0 auto;display:flex;border-top:2px solid rgba(74,25,66,.2);background:#fdf4ff;}
-.daily-block{flex:1;padding:8px 14px;}
-.daily-block:first-child{border-right:1px solid rgba(74,25,66,.15);}
-.daily-label{font-family:'Archivo Narrow',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7e22ce;opacity:.7;margin-bottom:3px;}
-.daily-text{font-size:13px;font-style:italic;line-height:1.45;color:#2a1832;}
+/* Slide color themes */
+#sl-world .news-head{background:var(--world);}
+#sl-world .news-body{background:var(--world-bg);}
+#sl-world .story-title a{color:var(--world);}
+#sl-leafs .news-head{background:var(--leafs);}
+#sl-leafs .news-body{background:var(--leafs-bg);}
+#sl-leafs .story-title a{color:var(--leafs);}
+#sl-nhl .news-head{background:var(--nhl);}
+#sl-nhl .news-body{background:var(--nhl-bg);}
+#sl-nhl .story-title a{color:var(--nhl);}
+#sl-ai .news-head{background:var(--ai);}
+#sl-ai .news-body{background:var(--ai-bg);}
+#sl-ai .story-title a{color:var(--ai);}
+#sl-hvac .news-head{background:var(--hvac);}
+#sl-hvac .news-body{background:var(--hvac-bg);}
+#sl-hvac .story-title a{color:var(--hvac);}
+#sl-local .news-head{background:var(--local);}
+#sl-local .news-body{background:var(--local-bg);}
+#sl-local .story-title a{color:var(--local);}
 
-@media(max-width:700px){
-  .dash-body{flex-direction:column;}
-  .dash-col:first-child{border-right:none;border-bottom:1px solid #d4c9b8;}
-  .news-body{columns:1;}
-  .forecast-strip{flex-wrap:wrap;}
+@media(max-width:640px){
+  .news-cols{grid-template-columns:1fr;}
+  .dash-cols{flex-direction:column;}
+  .dash-l{flex:0 0 auto;border-right:none;border-bottom:1px solid var(--rule);}
+  .thought-bar{flex-direction:column;gap:8px;}
 }
 </style>
 </head>
 <body>
 <div class="app">
 
+  <!-- Fixed top -->
   <div class="fixed-top">
     <div class="masthead">
-      <div class="mh-left">
-        <svg width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true">
-          <rect x="5" y="12" width="6" height="8" fill="#c9b882"/>
-          <rect x="6" y="4" width="4" height="9" fill="#c9b882"/>
-          <rect x="4" y="2" width="8" height="3" fill="#c9b882"/>
-          <ellipse cx="8" cy="3.5" rx="2.5" ry="1.8" fill="#f5e690"/>
-          <rect x="6" y="6" width="4" height="1" fill="#1c1810"/>
-          <rect x="6" y="9" width="4" height="1" fill="#1c1810"/>
-          <rect x="7" y="16" width="2" height="4" fill="#1c1810"/>
+      <div class="mhead-l">
+        <svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="0" width="6" height="5" rx="1" fill="#8b1a1a"/>
+          <polygon points="7,5 19,5 21,14 5,14" fill="#8b1a1a"/>
+          <rect x="4" y="14" width="18" height="13" rx="1" fill="#8b1a1a" opacity="0.82"/>
+          <rect x="2" y="27" width="22" height="4" rx="1" fill="#8b1a1a" opacity="0.6"/>
+          <rect x="10" y="8" width="6" height="4" rx="0.5" fill="#faf6ef"/>
+          <rect x="9" y="18" width="4" height="5" rx="0.5" fill="#faf6ef" opacity="0.75"/>
+          <rect x="13" y="18" width="4" height="5" rx="0.5" fill="#faf6ef" opacity="0.75"/>
         </svg>
-        <span class="mh-title">Jonathan's Morning Brief</span>
+        <div>
+          <div class="mhead-title">Jonathan's Morning Brief</div>
+          <div class="mhead-date" id="mhead-date">Loading...</div>
+        </div>
       </div>
-      <div class="mh-date" id="mh-date">Loading...</div>
+      <div class="mhead-r">Upper Tantallon, NS</div>
     </div>
     <div id="bin-banner"></div>
-    <div class="nav-strip">
-      <button class="nav-btn" onclick="navigate(-1)">&#8592; Prev</button>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="nav-dots" id="nav-dots"></div>
-        <span class="nav-counter" id="nav-counter">1 of 7</span>
-      </div>
-      <button class="nav-btn" onclick="navigate(1)">Next &#8594;</button>
-    </div>
   </div>
 
+  <!-- Deck -->
   <div class="deck" id="deck">
 
     <!-- Slide 1: Dashboard -->
-    <div class="slide active" id="slide-0">
-      <div class="dash-weather">
-        <div class="w-loading" id="w-loading">Fetching weather for Upper Tantallon...</div>
-        <div id="w-content" style="display:none;">
-          <div class="weather-now">
-            <div class="w-icon" id="w-icon">--</div>
-            <div>
-              <div class="w-temp" id="w-temp">--</div>
-              <div class="w-desc" id="w-desc">--</div>
-              <div class="w-wind" id="w-wind">--</div>
-            </div>
-            <div class="w-timeline" id="w-timeline"></div>
-          </div>
-          <div class="forecast-strip" id="forecast-strip"></div>
+    <div class="slide active" id="sl-dash">
+      <div class="wx-strip" id="wx-strip">
+        <div class="wx-cur" id="wx-cur">
+          <div class="wc-icon" id="wx-icon">--</div>
+          <div class="wc-temp" id="wx-temp">--</div>
+          <div class="wc-desc" id="wx-desc">Loading weather...</div>
+          <div class="wc-wind" id="wx-wind"></div>
+        </div>
+        <div class="wx-period" id="wx-morn">
+          <div class="wp-label">Morning</div>
+          <div class="wp-icon">--</div>
+          <div class="wp-temp">--</div>
+          <div class="wp-desc">--</div>
+        </div>
+        <div class="wx-period" id="wx-aft">
+          <div class="wp-label">Afternoon</div>
+          <div class="wp-icon">--</div>
+          <div class="wp-temp">--</div>
+          <div class="wp-desc">--</div>
+        </div>
+        <div class="wx-period" id="wx-eve">
+          <div class="wp-label">Evening</div>
+          <div class="wp-icon">--</div>
+          <div class="wp-temp">--</div>
+          <div class="wp-desc">--</div>
+        </div>
+        <div class="fc-strip" id="fc-strip">
+          <div class="loading-msg">Loading forecast...</div>
         </div>
       </div>
-      <div class="dash-body">
-        <div class="dash-col">
-          <div class="col-header">Action Items - Waiting on You</div>
-          <div id="action-items"></div>
+      <div class="dash-cols">
+        <div class="dash-l">
+          <div class="sec-head">Action Items</div>
+          <div class="act-item">
+            <div class="act-rank">1 -- Hard Deadline</div>
+            <div class="act-title"><a href="https://mail.google.com/mail/u/0/#all/19f38bafcf3d626d" target="_blank">Halifax Explosion Hockey: Lock In Atticus's Camp Spot</a></div>
+            <div class="act-desc">Coach replied Jul 6 confirming 2017 kids are welcome. He needs: parent contact info, phone number, level played, and an e-transfer. Back to School Camp runs Aug 31 to Sept 2. You said you wanted the spot -- nothing sent yet.</div>
+          </div>
+          <div class="act-item">
+            <div class="act-rank">2 -- Financial Decision</div>
+            <div class="act-title"><a href="https://mail.google.com/mail/u/0/#all/19f463fea47f368f" target="_blank">Air Canada: Cancelled Dallas Flight, $1,539 in Wallet</div>
+            <div class="act-desc">Flight CCXFKG (Halifax-Dallas, Oct 19) was cancelled Jul 9. You now have $1,539.28 in AC Wallet credit, expiring Jul 7, 2027. Decide: rebook Dallas or redirect the credit.</div>
+          </div>
+          <div class="act-item">
+            <div class="act-rank">3 -- Follow Up Needed</div>
+            <div class="act-title"><a href="https://mail.google.com/mail/u/0/#all/19f187e2e3247567" target="_blank">Motorcycle Insurance: Break the Balance Test Loop</a></div>
+            <div class="act-desc">Lauren at MacEachern (Jun 30) confirmed you need to pass your balance test on an already-insured motorcycle before you can get your own policy. You have not followed up in 10 days. Next step is yours.</div>
+          </div>
         </div>
-        <div class="dash-col">
-          <div class="col-header">Next 10 Days</div>
-          <div id="cal-events"></div>
+        <div class="dash-r">
+          <div class="sec-head">Next 10 Days</div>
+          <div class="cal-event">
+            <div class="cal-badge" style="background:#5b21b6;">
+              <div class="cb-day">10</div>
+              <div class="cb-mon">Jul</div>
+            </div>
+            <div class="cal-info">
+              <div class="ci-title">Jenny Visit</div>
+              <div class="ci-time">Today through Sat Jul 18 (all-day)</div>
+            </div>
+          </div>
+          <div class="cal-event">
+            <div class="cal-badge" style="background:#166534;">
+              <div class="cb-day">11</div>
+              <div class="cb-mon">Jul</div>
+            </div>
+            <div class="cal-info">
+              <div class="ci-title">Atticus Arts/Adventure Camp Wraps</div>
+              <div class="ci-time">Last day at SMC today/tomorrow</div>
+            </div>
+          </div>
+          <div class="cal-event">
+            <div class="cal-badge" style="background:#003e7e;">
+              <div class="cb-day">16</div>
+              <div class="cb-mon">Jul</div>
+            </div>
+            <div class="cal-info">
+              <div class="ci-title">Atticus Hockey</div>
+              <div class="ci-time">Thu, 6:00 pm -- 7:00 pm</div>
+              <div class="ci-loc">St. Margaret's Centre, 12 Westwood Blvd, Upper Tantallon</div>
+            </div>
+          </div>
+          <div class="cal-event">
+            <div class="cal-badge">
+              <div class="cb-day">20</div>
+              <div class="cb-mon">Jul</div>
+            </div>
+            <div class="cal-info">
+              <div class="ci-title">SMC Sports Zone Camp (Atticus)</div>
+              <div class="ci-time">Starts Jul 20 through Jul 25</div>
+            </div>
+          </div>
+          <div class="cal-note">Outside Edge 2027 Spring Team ID Camp confirmed for Aug 16.</div>
         </div>
       </div>
     </div>
 
     <!-- Slide 2: World -->
-    <div class="slide slide-world" id="slide-1">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">World</span><span class="news-hdr-sub">Past 24 hours</span></div>
-        <div class="news-body" id="world-body"><div class="news-quiet">Loading...</div></div>
-      </div>
+    <div class="slide" id="sl-world">
+      <div class="news-head"><h2>World</h2><div class="news-win">Past 24 hours</div></div>
+      <div class="news-body"><div class="news-cols" id="col-world"><div class="loading-msg">Loading...</div></div></div>
     </div>
 
     <!-- Slide 3: Maple Leafs -->
-    <div class="slide slide-leafs" id="slide-2">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">Toronto Maple Leafs</span><span class="news-hdr-sub">Past 24 hours</span></div>
-        <div class="news-body" id="leafs-body"><div class="news-quiet">Loading...</div></div>
-      </div>
+    <div class="slide" id="sl-leafs">
+      <div class="news-head"><h2>Toronto Maple Leafs</h2><div class="news-win">Past 24 hours</div></div>
+      <div class="news-body"><div class="news-cols" id="col-leafs"><div class="loading-msg">Loading...</div></div></div>
     </div>
 
     <!-- Slide 4: NHL -->
-    <div class="slide slide-nhl" id="slide-3">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">NHL</span><span class="news-hdr-sub">Past 24 hours</span></div>
-        <div class="news-body" id="nhl-body"><div class="news-quiet">Loading...</div></div>
-      </div>
+    <div class="slide" id="sl-nhl">
+      <div class="news-head"><h2>NHL</h2><div class="news-win">Past 24 hours -- league-wide</div></div>
+      <div class="news-body"><div class="news-cols" id="col-nhl"><div class="loading-msg">Loading...</div></div></div>
     </div>
 
     <!-- Slide 5: AI -->
-    <div class="slide slide-ai" id="slide-4">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">Artificial Intelligence</span><span class="news-hdr-sub">Past 2 weeks</span></div>
-        <div class="news-body" id="ai-body"><div class="news-quiet">Loading...</div></div>
-      </div>
+    <div class="slide" id="sl-ai">
+      <div class="news-head"><h2>AI</h2><div class="news-win">Past 2 weeks</div></div>
+      <div class="news-body"><div class="news-cols" id="col-ai"><div class="loading-msg">Loading...</div></div></div>
     </div>
 
     <!-- Slide 6: HVAC -->
-    <div class="slide slide-hvac" id="slide-5">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">HVAC Industry</span><span class="news-hdr-sub">Past 2 weeks</span></div>
-        <div class="news-body" id="hvac-body"><div class="news-quiet">Loading...</div></div>
-      </div>
+    <div class="slide" id="sl-hvac">
+      <div class="news-head"><h2>HVAC</h2><div class="news-win">Past 2 weeks -- Canada, USA, LATAM</div></div>
+      <div class="news-body"><div class="news-cols" id="col-hvac"><div class="loading-msg">Loading...</div></div></div>
     </div>
 
     <!-- Slide 7: Local -->
-    <div class="slide slide-local" id="slide-6">
-      <div class="news-inner">
-        <div class="news-hdr"><span class="news-hdr-title">St. Margaret's Bay &amp; HRM</span><span class="news-hdr-sub">Past 24 hours</span></div>
-        <div class="news-body" id="local-body"><div class="news-quiet">Loading...</div></div>
-        <div class="daily-footer">
-          <div class="daily-block">
-            <div class="daily-label">Thought for the Day</div>
-            <div class="daily-text" id="thought-text"></div>
-          </div>
-          <div class="daily-block">
-            <div class="daily-label">Claude Tip of the Day</div>
-            <div class="daily-text" id="tip-text"></div>
-          </div>
+    <div class="slide" id="sl-local">
+      <div class="news-head"><h2>St. Margaret's Bay and HRM</h2><div class="news-win">Past 24 hours</div></div>
+      <div class="news-body"><div class="news-cols" id="col-local"><div class="loading-msg">Loading...</div></div></div>
+      <div class="thought-bar">
+        <div class="tb-col">
+          <div class="tb-label">Thought for the Day</div>
+          <div class="tb-text" id="thought-txt">--</div>
+        </div>
+        <div class="tb-col">
+          <div class="tb-label">Claude Tip of the Day</div>
+          <div class="tb-text" id="tip-txt">--</div>
         </div>
       </div>
     </div>
 
+  </div><!-- /deck -->
+
+  <!-- Nav footer -->
+  <div class="nav-footer">
+    <button class="nav-btn" id="nav-prev">&#8592; Back</button>
+    <div class="nav-center">
+      <div class="nav-dots" id="nav-dots"></div>
+      <span class="nav-counter" id="nav-ctr">1 of 7</span>
+    </div>
+    <button class="nav-btn" id="nav-next">Next &#8594;</button>
   </div>
-</div>
+
+</div><!-- /app -->
 
 <script>
-// =====================================================
-// 1. DATE FOUNDATION
-// =====================================================
+// ── DATE FOUNDATION ──────────────────────────────────────────────
 const TZ = 'America/Halifax';
 const now = new Date();
 const local = new Date(now.toLocaleString('en-US', { timeZone: TZ }));
 const datelineText = new Intl.DateTimeFormat('en-CA', {
-  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: TZ
+  weekday:'long', month:'long', day:'numeric', year:'numeric', timeZone: TZ
 }).format(now);
-document.getElementById('mh-date').textContent = datelineText + ' | Upper Tantallon, NS';
+document.getElementById('mhead-date').textContent = datelineText + ' | Upper Tantallon, NS';
 
-// =====================================================
-// 2. RECENCY FILTER
-// =====================================================
-function hoursOld(pub) {
-  const t = Date.parse(pub);
-  return isNaN(t) ? Infinity : (Date.now() - t) / 3600000;
-}
-function fresh(items, maxHours) {
-  return items.filter(i => hoursOld(i.pubDate || i.date) <= maxHours);
-}
+// ── RECENCY FILTER ────────────────────────────────────────────────
+function hoursOld(pub) { const t = Date.parse(pub); return isNaN(t) ? Infinity : (Date.now() - t) / 3600000; }
+function fresh(items, maxHours) { return items.filter(i => hoursOld(i.pubDate || i.date) <= maxHours); }
 
-// =====================================================
-// 3. THOUGHT + TIP (day-of-year rotation, never blank)
-// =====================================================
+// ── DAY OF YEAR ───────────────────────────────────────────────────
 const startOfYear = new Date(local.getFullYear(), 0, 0);
 const doy = Math.floor((local - startOfYear) / 86400000);
 
+// ── THOUGHTS (62) ────────────────────────────────────────────────
 const THOUGHTS = [
-  "The gap between knowing and doing is where most strategies die.",
-  "Recurring revenue is not a product feature. It is a relationship you decided to charge for.",
-  "The best time to build a second income stream was five years ago. Today is still ahead of tomorrow.",
-  "Sales is not about convincing people. It is about helping the right people say yes faster.",
-  "Urgency without direction is just stress. Direction without urgency is just planning.",
-  "A $5M exit is not a windfall. It is proof that a system ran without you.",
-  "Most owners undercharge because they confuse price with worth.",
-  "Your competitor is not the company down the street. It is the homeowner's decision to do nothing.",
-  "The contractor who stops marketing when business is good is the one who panics when it slows.",
-  "Retention is the only marketing that compounds.",
-  "Every idle truck is a revenue leak. Every ignored past customer is a membership fee uncollected.",
-  "Build the playbook before you need the player.",
-  "The hardest conversation to have in an acquisition is the one you keep postponing.",
-  "Market share is not won in boardrooms. It is won in service vans and follow-up calls.",
-  "If your best month depends on the owner being present, you have not built a business.",
-  "Loyalty programs fail when the benefit is not felt on the day of signup.",
-  "A done-for-you offer eliminates the most common objection: time.",
-  "The residential HVAC market is fragmented by design. Consolidators know this. Independents should too.",
-  "A good strategy executed poorly beats a perfect strategy never started.",
-  "Ownership of recurring revenue is ownership of the future cash flow statement.",
-  "The morning you skip your planning ritual is the morning your competitors gain ground.",
-  "You cannot scale what you have not documented.",
-  "Trust is the fastest sales accelerator that money cannot buy.",
-  "Pricing anchored to your cost is a ceiling. Pricing anchored to customer value is a ramp.",
-  "LATAM market entry is not a translation problem. It is a trust-building problem.",
-  "The best acquisition target is a business run well by someone who wants to exit well.",
-  "Membership programs only work if the homeowner remembers why they joined.",
-  "Leadership is not about having the answers. It is about asking the questions first.",
-  "Your pipeline is a lagging indicator. Your activity is the leading one.",
-  "Every missed call is not just a missed sale. It is a membership fee that went to no one.",
-  "A service contract sold at installation is worth three times what is sold cold.",
-  "The first year of a side business is always the hardest because you are building without proof.",
-  "Scale requires systems. Systems require documentation. Documentation requires discipline.",
-  "A customer who stays is worth more than three new ones combined.",
-  "Brand is not what you say about yourself. It is what the homeowner says after you leave.",
-  "The contractor who sees a service call as a sales opportunity misses the point. See it as a trust call.",
-  "Momentum in business development looks slow from the inside and fast from the outside.",
-  "Never confuse a busy calendar with a productive week.",
-  "Distribution is the moat most founders forget to dig.",
-  "If you would not buy your own product at your own price, your market will tell you why.",
-  "The difference between a startup and a business is repeatability.",
-  "Capital follows clarity. Investors fund conviction.",
-  "The hold music in your service queue is the sound of attrition.",
-  "Every decision delayed by committee is a competitor's window.",
-  "Real strategic advantage is doing the boring thing consistently.",
-  "Integration risk is the most underpriced cost in any acquisition.",
-  "GoHighLevel is not a CRM. It is a revenue automation platform waiting for a strategy.",
-  "The homeowner does not want maintenance. They want peace of mind. Sell that.",
-  "A well-executed exit starts three years before anyone signs a letter of intent.",
-  "Your best customers are the ones who have already trusted you. Start there.",
-  "Automation does not replace relationships. It creates space to build better ones.",
-  "The number on your revenue target is less important than the system that produces it.",
-  "Underperforming markets usually have a structural problem, not a people problem.",
-  "Most businesses fail not from competition but from their own indecision.",
-  "The Sunbelt is not a geography. It is a growth thesis.",
-  "One follow-up email sent is worth ten proposals drafted and never sent.",
-  "Your pricing tells the market what you think you are worth.",
-  "HVAC acquisition multiples reflect confidence in the new owner as much as the EBITDA.",
-  "Recurring revenue turns a transaction into a relationship. That is worth the extra friction.",
-  "The exit you want in 2028 requires the discipline you start today.",
-  "Atticus is watching how you handle Thursdays. That matters more than the strategy doc.",
+  "Revenue you can predict is worth more than revenue you can only hope for.",
+  "The gap between what you know and what you do is where most money is lost.",
+  "Every HVAC shop sitting on 5 years of customer data and doing nothing with it is a business you can help.",
+  "The best time to build recurring revenue was five years ago. Second best time is today.",
+  "Distribution beats product. Every time.",
+  "The contractor who calls back first wins the job. The one who follows up wins the relationship.",
+  "Build the thing that runs while you sleep, or spend your life trading hours for dollars.",
+  "Your Mainstay pitch is not about software. It is about the $40,000 leaking out the back of every shop.",
+  "A customer who pays monthly is worth ten times one who pays once.",
+  "If the shop owner does not feel the pain in the first 30 seconds, you have not found the pain yet.",
+  "M&A is not just deal flow. It is relationship inventory built before the seller knows they want to sell.",
+  "LATAM market development: the first person who shows up with a system wins the decade.",
+  "The best entrepreneurs fix problems other people have learned to tolerate.",
+  "If you cannot explain why a homeowner should pay $X per month for peace of mind in one sentence, keep working on it.",
+  "Recurring revenue is not just a business model. It is a valuation multiplier.",
+  "Follow-up is where most BD deals are won or lost, not the first meeting.",
+  "The contractor with the best truck wrap and the worst follow-up loses to the one with a sticky note and a callback.",
+  "Your side business exit at $5M by 2028 is a math problem. Work backward from the number.",
+  "A done-for-you service removes the biggest objection: I do not have time to run this.",
+  "Price for value, not for cost. If the shop keeps 100% and pays $45/month, they only need one referral to be ahead.",
+  "In HVAC, the shoulder seasons are when shops have time to think. That is when to sell.",
+  "A warm customer list is not a list. It is a revenue stream waiting for someone to open the valve.",
+  "Three things compound: interest, knowledge, and relationships. Invest in all three daily.",
+  "The best acquisition targets are profitable shops whose owners are tired, not failing ones.",
+  "Speed of execution separates VP thinking from CEO thinking.",
+  "Most shop owners have never been shown that their customer list is worth more than their van.",
+  "Culture is what happens when the owner is not in the room.",
+  "You do not need to be the cheapest. You need to be the most obvious choice.",
+  "GoHighLevel is the infrastructure. Mainstay Revenue is the product. Never confuse the two in your pitch.",
+  "The Sunbelt focus is right. Heat, humidity, year-round HVAC dependence. The pain is real and constant.",
+  "A membership program is a promise the homeowner makes to themselves about not being caught in a panic.",
+  "Strong BD pipeline requires three things: consistent outreach, genuine follow-up, and a short decision path.",
+  "What gets measured in HVAC shops is usually revenue and headcount. There is an opportunity in everything else.",
+  "The difference between a deal and a relationship is time. Invest accordingly.",
+  "A $45 monthly payment from a shop with 300 members is $13,500 per month in base revenue. That is the math.",
+  "Fear of a missed call is more persuasive than the promise of a new one.",
+  "Atticus watching you build teaches him more about business than any school can.",
+  "The LATAM distribution problem is structural. Someone will solve it. Make sure it is you.",
+  "Never pitch a feature. Pitch the feeling after the problem is gone.",
+  "Business development is pattern recognition plus relationship maintenance plus discipline.",
+  "A 5x revenue multiple on $1M in ARR is $5M. That is the Mainstay Revenue exit math.",
+  "Workshops and camps are the M&A of parenting. Invest in the pipeline early.",
+  "The mortgage renews September 2029. Three years of lump-sum discipline buys real options.",
+  "In every market, there is one operator who figured out what the others have not. Study that person.",
+  "A cold call gets you a meeting. A warm introduction gets you a deal. A reputation gets you inbound.",
+  "Systems scale. Hustle does not.",
+  "The best GoHighLevel automations feel invisible to the shop owner and the homeowner. That is the goal.",
+  "Rooted Society and Mainstay Revenue are both community businesses at their core. Same DNA, different market.",
+  "Before you add a feature, ask whether removing friction does more.",
+  "Nova Scotia is a small market. Your real runway is the US Sunbelt.",
+  "A VP who closes deals personally is a BD engine. A VP who only manages people is overhead.",
+  "What is your next best alternative if the Parlay HVAC deal does not come together?",
+  "The shop that has your membership program is harder for a competitor to acquire than one that does not.",
+  "There is no better qualifying question than: what does a missed call cost you on a busy day?",
+  "Decision fatigue is real. The simpler your onboarding, the higher your close rate.",
+  "Your holding company in Nova Scotia is an asset protection decision as much as a tax one.",
+  "Shanice building Rooted Society while you build Mainstay Revenue is two assets appreciating in parallel.",
+  "Every day you do not follow up with a warm lead, the competitor who does gains ground.",
+  "The best businesses are ones where your customers would be embarrassed to cancel.",
+  "Time spent on strategy without execution is expensive daydreaming.",
+  "Atticus's hockey investment is about far more than hockey.",
+  "Show the shop their own data back to them. Nothing closes faster than a mirror.",
+  "The recurring revenue model protects the homeowner from panic pricing. Lead with that benefit.",
 ];
 
+// ── CLAUDE TIPS (62) ─────────────────────────────────────────────
 const TIPS = [
-  "Ask Claude to steelman the opposite of your position before you commit to a strategy.",
-  "Use Claude to draft three versions of any email: direct, diplomatic, and concise. Pick the best.",
-  "When reviewing a contract, tell Claude exactly what outcome you are trying to protect against.",
-  "Claude works best when you provide context first. Lead with the situation, then the question.",
-  "Ask Claude to list the three biggest risks in your plan before you ask it to help execute.",
-  "Use Claude to generate a week of LinkedIn posts from a single idea in under two minutes.",
-  "For sales emails, tell Claude who the reader is before asking for a draft. Persona first.",
-  "Ask Claude to rate a piece of writing on clarity, persuasion, and conciseness separately.",
-  "Use Claude to summarize a long contract or document before diving into the details yourself.",
-  "Ask Claude to identify what is missing from your business plan, not just what is there.",
-  "Claude can role-play as a skeptical buyer. Use this to stress-test your pitch before real calls.",
-  "When debugging a strategy, give Claude the result you got, not just the outcome you wanted.",
-  "Use 'Think step by step' in your prompt when you need Claude to reason through a complex problem.",
-  "Ask Claude to rewrite your value proposition from the customer's perspective, not yours.",
-  "For recurring themes across many emails, paste five examples and ask Claude to find patterns.",
-  "Claude can generate a full FAQ for your sales page based on your product description alone.",
-  "Use Claude to compare two business models side by side across criteria you specify.",
-  "Ask Claude to identify the single most important metric for a decision before listing others.",
-  "Claude can draft follow-up sequences, not just individual emails. Ask for a three-email series.",
-  "When prospecting, ask Claude to write an outreach email that leads with the reader's problem.",
-  "Tell Claude the constraints first. Constraints produce better creative output than open prompts.",
-  "Use Claude to reverse-engineer a competitor's positioning from their homepage copy.",
-  "Ask Claude to act as a HVAC contractor and respond to your pitch. The objections are gold.",
-  "For GoHighLevel automation flows, describe the trigger and desired outcome. Claude handles the logic.",
-  "Claude can generate sales objection responses for your team in under a minute per objection.",
-  "Always specify the output format: one paragraph, three bullets, a table. Unspecified means guessing.",
-  "Use Claude to write the About section of your pitch deck from your own biography notes.",
-  "Ask Claude to identify which parts of your pitch are features and which are benefits. Fix the ratio.",
-  "Claude can generate a competitive analysis in minutes if you paste in competitor website text.",
-  "For a difficult conversation, ask Claude to write both sides of the dialogue first.",
-  "Use Claude to turn a rough voice note transcript into a polished meeting summary.",
-  "Ask Claude to write a one-sentence tagline and ten variations. One will be right.",
-  "Claude is better at editing than generating from scratch. Give it a rough draft, not a blank canvas.",
-  "Use Claude to convert financial projections into plain-language narrative for non-finance readers.",
-  "When building a sales script, ask Claude to write the qualifying questions first, not the close.",
-  "Claude can help you think through an acquisition by listing integration risks by category.",
-  "Ask Claude what questions a due diligence team would ask about your business. Answer them now.",
-  "Use Claude to draft the confirmation email, the onboarding email, and the 30-day check-in as a set.",
-  "For LATAM market entry, ask Claude to compare buyer behaviour across Canada, USA, and LATAM.",
-  "Claude can write a CRM note from a call summary you paste in. Saves five minutes per deal.",
-  "Ask Claude to generate a list of trigger events that signal a residential HVAC owner is ready to sell.",
-  "Use Claude to create a scoring rubric for evaluating acquisition targets before any calls.",
-  "Claude can write Google review responses for your team in bulk from a list of review snippets.",
-  "Ask Claude to identify the emotional driver behind a customer's objection, not just the words used.",
-  "Use Claude to build a one-page competitive battlecard for any competitor in under three minutes.",
-  "For any recurring task, ask Claude to help you document the process before you automate it.",
-  "Claude can help you define an ideal customer profile by asking it questions about your best clients.",
-  "Ask Claude to write your referral ask email as if you were writing to a close friend. Then refine it.",
-  "Use Claude to audit your pricing page for clarity. Paste it in, ask what is confusing.",
-  "Claude can generate a month of subject line variations for your email campaigns from one theme.",
-  "For discovery calls, ask Claude to generate five open-ended questions that surface pain quickly.",
-  "Use Claude to summarize what competitors are saying in reviews, not just what they claim in ads.",
-  "Ask Claude to draft your north star metric and one supporting metric for each part of your funnel.",
-  "Claude can generate a customer testimonial template that prompts the specific quotes you need.",
-  "Use Claude to write a transition email from transaction to membership, addressing the main objection.",
-  "Ask Claude what your GoHighLevel workflow is missing before you launch a new automation.",
-  "Claude can identify weak spots in a proposal by asking it to play the role of the decision-maker.",
-  "Use Claude to draft a BATNA analysis before any negotiation, even informal ones.",
-  "Ask Claude to write a version of your pitch that assumes the reader has never heard of you.",
-  "Claude can build a competitive moat analysis for any business model in under five minutes.",
-  "Use Claude to generate the next three strategic moves based on your current pipeline status.",
+  "Ask Claude to pressure-test your pitch by taking the hardest counterargument a skeptical shop owner would give.",
+  "Give Claude your GoHighLevel workflow and ask it to find the single most likely drop-off point.",
+  "Use Claude to draft three price-anchoring framings for the $45/month conversation and pick the one that lands.",
+  "Ask Claude to write a 60-second voicemail script for cold-calling residential HVAC shops in the Sunbelt.",
+  "Give Claude a sales thread and ask what the prospect is really worried about underneath the stated objection.",
+  "Use Claude to map what an HVAC shop owner's ideal Monday looks like, then position Mainstay Revenue inside it.",
+  "Ask Claude to write a one-paragraph objection handler for 'my customers will not pay monthly for HVAC service.'",
+  "Ask Claude to identify the three riskiest assumptions in your Mainstay Revenue model and what would disprove each.",
+  "Use Claude to generate 10 cold email subject lines for HVAC shop owners, then A/B test the top two.",
+  "Ask Claude to summarize an M&A target's public info into a one-page snapshot before your intro call.",
+  "Use Claude to draft a one-page overview of Mainstay Revenue you could hand to an acquirer in year 3.",
+  "Ask Claude to rewrite your value proposition from the homeowner's perspective, not the shop owner's.",
+  "Give Claude your pricing structure and ask it to simplify the story for a contractor who has never heard of recurring revenue.",
+  "Use Claude to build a decision tree for qualifying HVAC shops by revenue range, customer count, and CRM usage.",
+  "Ask Claude to write a LinkedIn DM to an HVAC shop owner that opens with their pain, not your product.",
+  "Use Claude to write a follow-up email sequence: day 1, day 3, day 7 after a no-show demo.",
+  "Ask Claude to identify what makes a Sunbelt HVAC shop most vs. least likely to convert.",
+  "Use Claude to summarize the last month of GoHighLevel updates and flag the two most relevant to your setup.",
+  "Ask Claude to build a one-year roadmap from 10 shops to 100 shops with the key milestones and blockers.",
+  "Give Claude your onboarding checklist and ask it to find the step most likely to cause month-1 churn.",
+  "Ask Claude what questions an acquirer would ask in due diligence on a GoHighLevel-based SaaS business.",
+  "Use Claude to generate three case study outlines for the shops that would benefit most visibly from the model.",
+  "Ask Claude to draft the FAQ section of your Mainstay Revenue sales page, written from a skeptical shop owner's mind.",
+  "Use Claude to prep for a tough Innovair BD meeting by role-playing the most likely objections.",
+  "Ask Claude to identify HVAC acquisition market trends most relevant to your deal sourcing strategy this quarter.",
+  "Give Claude a deal memo and ask what information is missing before you can confidently size the opportunity.",
+  "Use Claude to draft a quarterly review outline for your LATAM underperformance analysis at Innovair.",
+  "Ask Claude to analyze the Parlay HVAC situation and list the three questions you most need answered before the next call.",
+  "Use Claude to build a one-page competitive teardown of any HVAC membership programs you have found in the market.",
+  "Ask Claude to write a referral email from a shop owner to their homeowner list introducing the membership.",
+  "Use Claude to create a 5-year financial model scaffold for Mainstay Revenue with adjustable assumptions.",
+  "Ask Claude to draft talking points for a conversation with Shanice about the Pinched4Time holding company structure.",
+  "Use Claude to identify the five most common reasons homeowners do not renew annual HVAC service plans.",
+  "Ask Claude to generate a LATAM go-to-market summary you could present internally at Innovair.",
+  "Use Claude to write the script for a 90-second explainer video for HVAC shop owners on the Mainstay concept.",
+  "Give Claude your three biggest work distractions this week and ask it to suggest a time-blocking schedule.",
+  "Ask Claude to list the five biggest HVAC private equity platforms and what add-on types they seek most actively.",
+  "Use Claude to draft a short note to Manam with clear specs on the next scheduling integration milestone.",
+  "Ask Claude to write a landing page headline and subheadline for Mainstay Revenue that leads with lost revenue.",
+  "Ask Claude to generate 10 names for a homeowner membership plan you could white-label for HVAC shops.",
+  "Use Claude to build a one-page pitch that a shop owner could use to sell the membership to their own customers.",
+  "Ask Claude to write a cold email from 'Jonathan' (no last name, no company) that does not reveal your day job.",
+  "Use Claude to identify three Sunbelt markets to target first based on HVAC penetration and home age profile.",
+  "Give Claude a completed customer onboarding flow and ask it to find the two steps most likely to feel like friction.",
+  "Use Claude to draft a one-paragraph bio for Jonathan to use on the Mainstay Revenue website, first name only.",
+  "Ask Claude to help think through the right equity structure if you bring on a US-based sales partner.",
+  "Use Claude to write a 'why now' section for a Mainstay deck: what market conditions make 2026 the right year.",
+  "Ask Claude to identify the single metric that most predicts whether Mainstay Revenue reaches a $5M exit value.",
+  "Use Claude to generate the first 30 days of content ideas for a Mainstay social presence aimed at shop owners.",
+  "Ask Claude to write a one-pager comparing Mainstay Revenue to an in-house membership program a shop might try to build themselves.",
+  "Give Claude the Dettson Skypak brief and ask it to draft key marketing messages for three different buyer personas.",
+  "Use Claude to map the downstream effects on Innovair's deal pipeline if the Parlay HVAC acquisition falls through.",
+  "Ask Claude to draft a structured agenda for a 45-minute LATAM strategy review meeting.",
+  "Use Claude to identify what an ideal HVAC M&A target profile looks like based on your sourcing criteria.",
+  "Ask Claude to write a one-paragraph description of Mainstay Revenue for the Nova Scotia holding company documents.",
+  "Use Claude to create a simple dashboard outline in GoHighLevel showing shop owners their membership ROI in real time.",
+  "Ask Claude to role-play a 10-minute sales call with a skeptical HVAC shop owner in Phoenix who has heard every pitch.",
+  "Use Claude to write a sample onboarding email from a shop to their homeowner list introducing the new program.",
+  "Ask Claude what three automations in GoHighLevel would have the highest impact on homeowner retention in year 1.",
+  "Give Claude this morning's action items and ask it to write the three emails or messages you need to send today.",
+  "Use Claude to generate a list of 20 HVAC industry events in the US Sunbelt where shop owners gather in 2026-2027.",
+  "Ask Claude to write a reactivation sequence for homeowners who have not used their HVAC shop in 18 months.",
+  "Ask Claude to help you write the investor-facing one-pager for Pinched4Time Inc. pitched toward a 2028 exit buyer.",
 ];
 
 const thought = THOUGHTS[doy % THOUGHTS.length];
 const tip = TIPS[doy % TIPS.length];
-document.getElementById('thought-text').textContent = thought;
-document.getElementById('tip-text').textContent = tip;
+document.getElementById('thought-txt').textContent = thought;
+document.getElementById('tip-txt').textContent = tip;
 
-// =====================================================
-// 4. BIN PICKUP BANNER
-// =====================================================
+// ── BIN BANNER ────────────────────────────────────────────────────
 const dow = local.getDay();
 if (dow === 0 || dow === 1 || dow === 6) {
-  const monday = new Date(local);
-  monday.setHours(0, 0, 0, 0);
+  const monday = new Date(local); monday.setHours(0,0,0,0);
   monday.setDate(monday.getDate() + (dow === 1 ? 0 : (8 - dow) % 7));
   const anchor = new Date(2026, 6, 6);
   const weeks = Math.round((monday - anchor) / (7 * 86400000));
   const type = ((((weeks % 2) + 2) % 2) === 0) ? 'Recycling' : 'Garbage';
-  const inGreen = monday >= new Date(2026, 5, 29) && monday <= new Date(2026, 9, 2);
-  const key = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
-  const shifts = { '2026-02-16': 'Heritage Day', '2026-05-18': 'Victoria Day', '2026-08-03': 'Natal Day', '2026-09-07': 'Labour Day', '2026-10-12': 'Thanksgiving' };
-  const mLabel = monday.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+  const inGreen = monday >= new Date(2026,5,29) && monday <= new Date(2026,9,2);
+  const key = monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
+  const shifts = {'2026-02-16':'Heritage Day','2026-05-18':'Victoria Day','2026-08-03':'Natal Day','2026-09-07':'Labour Day','2026-10-12':'Thanksgiving'};
+  const mLabel = monday.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
   const green = inGreen ? ', green cart too' : '';
   let text;
   if (shifts[key]) {
-    const sat = new Date(monday);
-    sat.setDate(sat.getDate() - 2);
-    const sLabel = sat.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-    text = 'No Monday pickup. Moved to Saturday ' + sLabel + ' for ' + shifts[key] + ': ' + type + green;
+    const sat = new Date(monday); sat.setDate(sat.getDate()-2);
+    const sLabel = sat.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+    text = 'No Monday pickup. Moved to Saturday '+sLabel+' for '+shifts[key]+': '+type+green;
   } else {
-    text = 'Monday ' + mLabel + ': ' + type + green;
+    text = 'Monday '+mLabel+': '+type+green;
   }
   const el = document.getElementById('bin-banner');
-  el.textContent = (type === 'Recycling' ? '♻️  ' : '🗑️  ') + text;
+  el.textContent = text;
   el.classList.add(type === 'Recycling' ? 'is-recycle' : 'is-garbage');
   el.style.display = 'block';
 }
 
-// =====================================================
-// 5. NAVIGATION
-// =====================================================
-const TOTAL = 7;
+// ── SLIDE NAVIGATION ─────────────────────────────────────────────
+const SLIDES = ['sl-dash','sl-world','sl-leafs','sl-nhl','sl-ai','sl-hvac','sl-local'];
 let cur = 0;
-const slides = document.querySelectorAll('.slide');
 const dotsEl = document.getElementById('nav-dots');
-const counterEl = document.getElementById('nav-counter');
-for (let i = 0; i < TOTAL; i++) {
+SLIDES.forEach((_,i) => {
   const d = document.createElement('div');
-  d.className = 'nav-dot' + (i === 0 ? ' active' : '');
-  d.onclick = () => goTo(i);
+  d.className = 'nav-dot' + (i===0?' active':'');
+  d.addEventListener('click', () => goTo(i));
   dotsEl.appendChild(d);
-}
-function goTo(idx) {
-  slides[cur].classList.remove('active');
+});
+function goTo(n) {
+  document.getElementById(SLIDES[cur]).classList.remove('active');
   dotsEl.children[cur].classList.remove('active');
-  cur = (idx + TOTAL) % TOTAL;
-  slides[cur].classList.add('active');
+  cur = Math.max(0, Math.min(n, SLIDES.length-1));
+  document.getElementById(SLIDES[cur]).classList.add('active');
   dotsEl.children[cur].classList.add('active');
-  counterEl.textContent = (cur + 1) + ' of ' + TOTAL;
+  document.getElementById('nav-ctr').textContent = (cur+1)+' of '+SLIDES.length;
 }
-function navigate(dir) { goTo(cur + dir); }
-document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') navigate(1); if (e.key === 'ArrowLeft') navigate(-1); });
-let tx = 0;
-const deck = document.getElementById('deck');
-deck.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-deck.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1); }, { passive: true });
+document.getElementById('nav-prev').addEventListener('click', () => goTo(cur-1));
+document.getElementById('nav-next').addEventListener('click', () => goTo(cur+1));
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') goTo(cur+1);
+  if (e.key==='ArrowLeft')  goTo(cur-1);
+});
+let tStart = null;
+document.getElementById('deck').addEventListener('touchstart', e => { tStart = e.touches[0].clientX; }, {passive:true});
+document.getElementById('deck').addEventListener('touchend', e => {
+  if (tStart===null) return;
+  const diff = tStart - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) diff > 0 ? goTo(cur+1) : goTo(cur-1);
+  tStart = null;
+}, {passive:true});
 
-// =====================================================
-// 6. WEATHER
-// =====================================================
-const WMO = {
-  0:['☀️','Clear sky'], 1:['🌤','Mainly clear'], 2:['⛅','Partly cloudy'], 3:['☁️','Overcast'],
-  45:['🌫','Foggy'], 48:['🌫','Freezing fog'], 51:['🌦','Light drizzle'], 53:['🌦','Drizzle'],
-  55:['🌧','Heavy drizzle'], 61:['🌧','Light rain'], 63:['🌧','Rain'], 65:['🌧','Heavy rain'],
-  71:['🌨','Light snow'], 73:['🌨','Snow'], 75:['🌨','Heavy snow'], 77:['🌨','Snow grains'],
-  80:['🌧','Showers'], 81:['🌧','Showers'], 82:['⛈','Heavy showers'],
-  95:['⛈','Thunderstorm'], 96:['⛈','Thunderstorm'], 99:['⛈','Severe thunderstorm']
-};
-function wmo(c) { return WMO[c] || ['🌡','--']; }
-const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
+// ── WEATHER ───────────────────────────────────────────────────────
+function wmoIcon(c) {
+  if (c===0)       return {e:'☀️', d:'Clear'};
+  if (c<=1)        return {e:'🌤️', d:'Mainly clear'};
+  if (c<=2)        return {e:'⛅', d:'Partly cloudy'};
+  if (c===3)       return {e:'☁️', d:'Overcast'};
+  if (c<=49)       return {e:'🌫️', d:'Fog'};
+  if (c<=57)       return {e:'🌦️', d:'Drizzle'};
+  if (c<=67)       return {e:'🌧️', d:'Rain'};
+  if (c<=77)       return {e:'❄️', d:'Snow'};
+  if (c<=82)       return {e:'🌧️', d:'Showers'};
+  if (c<=86)       return {e:'🌨️', d:'Snow showers'};
+  if (c<=99)       return {e:'⛈️', d:'Thunderstorm'};
+  return {e:'🌡️', d:'--'};
+}
 async function loadWeather() {
   try {
-    const url = 'https://api.open-meteo.com/v1/forecast?latitude=44.65&longitude=-63.85&hourly=temperature_2m,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=America%2FHalifax&forecast_days=5&wind_speed_unit=kmh&temperature_unit=celsius';
-    const r = await fetch(url);
-    const d = await r.json();
-    const h = d.hourly; const dd = d.daily;
-    const todayStr = local.toISOString().slice(0, 10);
-    const off = h.time.findIndex(t => t.startsWith(todayStr));
-    const hr = local.getHours();
-    const ci = off + hr;
-    const [icon, desc] = wmo(h.weathercode[ci]);
-    document.getElementById('w-icon').textContent = icon;
-    document.getElementById('w-temp').textContent = Math.round(h.temperature_2m[ci]) + '°C';
-    document.getElementById('w-desc').textContent = desc;
-    document.getElementById('w-wind').textContent = 'Wind: ' + Math.round(h.windspeed_10m[ci]) + ' km/h';
-    const tl = document.getElementById('w-timeline');
-    [['Morn', 8], ['Aftn', 14], ['Evng', 19]].forEach(([lbl, hr2]) => {
-      const idx = off + hr2;
-      const [ic] = wmo(h.weathercode[idx]);
-      const el = document.createElement('div');
-      el.className = 'w-tod';
-      el.innerHTML = '<span class="w-tod-label">' + lbl + '</span><span class="w-tod-val">' + ic + ' ' + Math.round(h.temperature_2m[idx]) + '°</span>';
-      tl.appendChild(el);
-    });
-    const fs = document.getElementById('forecast-strip');
-    for (let i = 1; i <= 4; i++) {
-      const dt = new Date(dd.time[i] + 'T12:00:00');
-      const [fic] = wmo(dd.weathercode[i]);
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=44.65&longitude=-63.85' +
+      '&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m' +
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min' +
+      '&timezone=America%2FHalifax&forecast_days=5';
+    const d = await (await fetch(url)).json();
+    const todayStr = local.toISOString().slice(0,10);
+    const times = d.hourly.time;
+    const hIdx = h => times.findIndex(t => t === todayStr+'T'+String(h).padStart(2,'0')+':00');
+    const curH = local.getHours();
+    const ci = hIdx(curH) >= 0 ? hIdx(curH) : 0;
+    const mi = hIdx(8), ai = hIdx(14), ei = hIdx(19);
+    const cw = wmoIcon(d.hourly.weather_code[ci]);
+    document.getElementById('wx-icon').textContent = cw.e;
+    document.getElementById('wx-temp').textContent = Math.round(d.hourly.temperature_2m[ci]) + '°C';
+    document.getElementById('wx-desc').textContent = cw.d;
+    document.getElementById('wx-wind').textContent = 'Wind: ' + Math.round(d.hourly.wind_speed_10m[ci]) + ' km/h | Feels like ' + Math.round(d.hourly.apparent_temperature[ci]) + '°C';
+    function fillP(id, idx) {
+      if (idx < 0) return;
+      const el = document.getElementById(id);
+      const w = wmoIcon(d.hourly.weather_code[idx]);
+      el.children[1].textContent = w.e;
+      el.children[2].textContent = Math.round(d.hourly.temperature_2m[idx]) + '°C';
+      el.children[3].textContent = w.d;
+    }
+    fillP('wx-morn', mi); fillP('wx-aft', ai); fillP('wx-eve', ei);
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const fc = document.getElementById('fc-strip');
+    fc.innerHTML = '';
+    for (let i=1; i<=4; i++) {
+      const dd = new Date(local); dd.setDate(dd.getDate()+i);
+      const fw = wmoIcon(d.daily.weather_code[i]);
       const chip = document.createElement('div');
       chip.className = 'fc-chip';
-      chip.innerHTML = '<div class="fc-day">' + DAYS[dt.getDay()] + '</div><div class="fc-icon">' + fic + '</div><div class="fc-temps"><span class="fc-hi">' + Math.round(dd.temperature_2m_max[i]) + '°</span><span class="fc-lo">' + Math.round(dd.temperature_2m_min[i]) + '°</span></div>';
-      fs.appendChild(chip);
+      chip.innerHTML = '<div class="fc-day">'+days[dd.getDay()]+'</div><div class="fc-icon">'+fw.e+'</div><div class="fc-temps"><span class="fc-hi">'+Math.round(d.daily.temperature_2m_max[i])+'°</span><span style="color:#888"> / </span><span class="fc-lo">'+Math.round(d.daily.temperature_2m_min[i])+'°</span></div>';
+      fc.appendChild(chip);
     }
-    document.getElementById('w-loading').style.display = 'none';
-    document.getElementById('w-content').style.display = 'block';
   } catch(e) {
-    document.getElementById('w-loading').textContent = 'Weather unavailable - check connection.';
+    document.getElementById('wx-desc').textContent = 'Weather unavailable';
   }
 }
 loadWeather();
 
-// =====================================================
-// 7. ACTION ITEMS
-// =====================================================
-const ACTIONS = [
-  {
-    rank: '1 - Hard Deadline Today',
-    title: 'Webinar at 3 PM Atlantic: How to Turn Summer Service Calls Into Lifelong Customers',
-    desc: "You're registered. Starts 11 AM PDT (3 PM Halifax). Directly relevant to Mainstay Revenue positioning - do not miss this one.",
-    link: 'https://mail.google.com/mail/u/0/#all/19f3dbb99f94daa2'
-  },
-  {
-    rank: '2 - Act Soon',
-    title: 'CSL 2026-2027 Season - Deposits Now Open',
-    desc: 'Celebrity Shinny League has opened deposits for the upcoming season. Spots fill up. Decide and pay to hold your spot.',
-    link: 'https://mail.google.com/mail/u/0/#all/19f42a5b49203e5a'
-  },
-  {
-    rank: '3 - Quick Win',
-    title: 'Volcano Lodge Hotel sent a message about your upcoming reservation',
-    desc: "The hotel reached out via Hotels.com (booked Jul 7). Linked to your Air Canada flight CCXFKG, Halifax to Dallas Oct 19. Read and reply if needed.",
-    link: 'https://mail.google.com/mail/u/0/#all/19f3c715299aab4c'
-  }
-];
-const aiEl = document.getElementById('action-items');
-ACTIONS.forEach(a => {
-  aiEl.innerHTML += '<div class="action-item"><div class="action-rank">' + a.rank + '</div><div class="action-title"><a href="' + a.link + '" target="_blank">' + a.title + '</a></div><div class="action-desc">' + a.desc + '</div></div>';
-});
-
-// =====================================================
-// 8. CALENDAR
-// =====================================================
-const CAL = [
-  { date: '2026-07-09', dow: 'Thu', dom: '9', title: "Atticus Hockey", meta: '7:00 - 8:00 PM | St. Margaret\'s Centre', today: true },
-  { date: '2026-07-09', dow: 'Thu', dom: '9', title: "SMC Arts/Adventure Camp - Last Day", meta: 'All day | Atticus', today: true },
-  { date: '2026-07-10', dow: 'Fri', dom: '10', title: "Jenny Visit begins", meta: 'All day', today: false },
-  { date: '2026-07-16', dow: 'Thu', dom: '16', title: "Atticus Hockey", meta: '6:00 - 7:00 PM | St. Margaret\'s Centre', today: false },
-  { date: '2026-07-18', dow: 'Sat', dom: '18', title: "Jenny Visit ends", meta: 'All day', today: false }
-];
-const calEl = document.getElementById('cal-events');
-CAL.forEach(ev => {
-  calEl.innerHTML += '<div class="cal-event"><div class="cal-badge' + (ev.today ? ' today' : '') + '"><span class="dow">' + ev.dow + '</span><span class="dom">' + ev.dom + '</span></div><div><div class="cal-event-title">' + ev.title + '</div><div class="cal-event-meta">' + ev.meta + '</div></div></div>';
-});
-
-// =====================================================
-// 9. NEWS (live RSS via rss2json, curated fallback)
-// =====================================================
+// ── NEWS ──────────────────────────────────────────────────────────
 function stripHtml(s) {
-  return (s || '').replace(/<[^>]*>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ').trim();
+  const el = document.createElement('div');
+  el.innerHTML = s || '';
+  return el.textContent.trim().replace(/\s+/g,' ').slice(0,200);
 }
-function fmtDate(pub) {
-  const d = new Date(pub);
-  if (isNaN(d)) return '';
-  return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', timeZone: TZ });
+function fmtDate(s) {
+  const t = Date.parse(s);
+  if (isNaN(t)) return '';
+  return new Date(t).toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:TZ});
 }
-function dedup(items) {
-  const seen = new Set();
-  return items.filter(i => {
-    const k = (i.title || '').toLowerCase().replace(/\s+/g,' ').slice(0, 55);
-    if (seen.has(k)) return false;
-    seen.add(k); return true;
-  });
+async function rss(url, n) {
+  try {
+    const api = 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url)+'&count='+(n||12);
+    const d = await (await fetch(api)).json();
+    return (d.status==='ok') ? (d.items||[]) : [];
+  } catch(e) { return []; }
 }
-function renderSection(id, items, maxH, quietLabel) {
-  const el = document.getElementById(id);
-  const hits = fresh(dedup(items), maxH).slice(0, 4);
-  if (!hits.length) {
-    el.innerHTML = '<div class="news-quiet">Quiet. Nothing in the last ' + quietLabel + '.</div>';
+function render(containerId, items, quietMsg) {
+  const el = document.getElementById(containerId);
+  if (!items || !items.length) {
+    el.innerHTML = '<div class="news-quiet">Quiet. '+quietMsg+'</div>';
     return;
   }
-  el.innerHTML = hits.map(s =>
-    '<div class="story"><div class="story-date">' + fmtDate(s.pubDate || s.date) + '</div>' +
-    '<div class="story-title"><a href="' + (s.link || s.url || '#') + '" target="_blank">' + (s.title || '') + '</a></div>' +
-    '<div class="story-desc">' + stripHtml(s.description || s.desc || '').slice(0, 220) + '</div></div>'
-  ).join('');
+  const seen = new Set();
+  const uniq = items.filter(it => {
+    const k = (it.title||'').toLowerCase().slice(0,36);
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0,4);
+  el.innerHTML = uniq.map(it => {
+    const desc = it.desc || stripHtml(it.description||it.content||'');
+    const takeaway = it.takeaway ? '<div class="story-take">Takeaway: '+it.takeaway+'</div>' : '';
+    const descHtml = desc ? '<div class="story-desc">'+desc+'</div>' : '';
+    return '<div class="story"><div class="story-date">'+fmtDate(it.pubDate||it.date)+'</div>'
+      +'<div class="story-title"><a href="'+(it.link||'#')+'" target="_blank">'+it.title+'</a></div>'
+      +descHtml+takeaway
+      +'<div class="story-src">'+(it.source||'')+'</div></div>';
+  }).join('');
 }
-async function fetchRSS(rssUrl, count) {
-  const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl) + '&count=' + count;
-  const r = await fetch(api, { signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
-  const d = await r.json();
-  return (d.items || []).map(i => ({ title: i.title, link: i.link, pubDate: i.pubDate, description: i.description }));
-}
 
-const CURATED = {
-  world: [
-    { title: 'U.S. Launches Airstrikes on Iran; Tehran Retaliates Across Gulf States', link: 'https://www.npr.org/sections/news', date: '2026-07-09T06:00:00Z', desc: 'American forces hit more than 80 Iranian targets including air defenses and radar sites after Iran attacked three oil tankers in the Strait of Hormuz. Tehran fired back at Bahrain, Kuwait and Qatar, threatening a fragile interim deal.' },
-    { title: 'Trump at NATO Summit: Ukraine Gets Patriot Missile License, Greenland Remains Off the Table', link: 'https://www.npr.org/sections/world/', date: '2026-07-09T05:30:00Z', desc: 'President Trump met Zelensky in Turkey, committing to a license allowing Ukraine to manufacture Patriot missiles. Separately, Trump reiterated his interest in Greenland - a claim Denmark and Greenland both firmly rejected.' },
-    { title: 'McConnell Unseen Since June Hospitalization; Governor Demands Transparency', link: 'https://wng.org/podcasts/thursday-morning-news-july-9-2026-1783538285', date: '2026-07-08T18:00:00Z', desc: 'Democratic Governor Andy Beshear sent an open letter demanding transparency about the 84-year-old senator, who has not appeared publicly since a June 14 hospitalization. Aides say only that he is improving.' }
-  ],
-  leafs: [
-    { title: 'Leafs Sign Bobrovsky, Add Nick Paul and Six Others in Major Offseason Reset', link: 'https://www.nhl.com/mapleleafs/news/', date: '2026-07-08T14:00:00Z', desc: 'Toronto traded Nick Robertson to Pittsburgh, then added two-time Cup winner Sergei Bobrovsky in net plus Nick Paul (trade with Tampa), Colton Sissons, Jack Roslovic, Brandon Duhaime, Teddy Blueger, and Zack MacEwen. Plus defensemen Raddysh and Andrae.' },
-    { title: '2026 Development Camp Underway at Ford Performance Centre', link: 'https://www.nhl.com/mapleleafs/news/maple-leafs-announce-2026-development-camp-roster', date: '2026-07-08T09:00:00Z', desc: "Toronto's development camp is running through this week, with prospects in on-ice sessions at Ford Performance Centre as the Leafs evaluate the pipeline heading into 2026-27." },
-    { title: 'Alfredsson, Gruden, Werenka Join Maple Leafs Coaching Staff', link: 'https://ca.sports.yahoo.com/news/whats-next-maple-leafs-following-130006789.html', date: '2026-07-07T10:00:00Z', desc: 'Daniel Alfredsson has joined the coaching staff alongside John Gruden and Brad Werenka, signaling a significant rebuild at the bench level for the 2026-27 Maple Leafs.' }
-  ],
-  nhl: [
-    { title: 'NHL Salary Cap Rises to $104M for 2026-27; Several Notable UFAs Still Unsigned', link: 'https://www.spectorshockey.net/2026/07/nhl-morning-coffee-headlines-july-8-2026/', date: '2026-07-09T08:00:00Z', desc: 'The cap climbs $8.5M from last season. Notable unrestricted free agents still available include Patrick Kane, Vladimir Tarasenko, Patrik Laine, and goaltender Cam Talbot.' },
-    { title: 'NHL Regular Season Schedule Release Set for July 16; 84-Game Season Coming', link: 'https://media.nhl.com/public/news/19973', date: '2026-07-09T07:00:00Z', desc: 'The NHL will release the full 2026-27 schedule on July 16. For the first time since 1993-94, all teams will play an 84-game regular season.' },
-    { title: 'Connor Murphy Re-Signs in Edmonton on 5-Year Deal After Trade Deadline Acquisition', link: 'https://www.spectorshockey.net/2026/07/nhl-rumor-mill-july-8-2026/', date: '2026-07-08T12:00:00Z', desc: 'Murphy, acquired by the Oilers at the 2026 deadline for a second-round pick, committed long-term on a five-year deal at $4.1M AAV, giving Edmonton defensive stability.' },
-    { title: 'Canadiens Hire Derek Lalonde as Assistant Coach', link: 'https://www.nhl.com/news/', date: '2026-07-08T10:00:00Z', desc: 'Montreal has added Derek Lalonde to the coaching staff, replacing Trevor Letowski who stepped back from the bench to spend more time with his family.' }
-  ],
-  ai: [
-    { title: 'Claude Fable 5 Returns Worldwide After U.S. Export Controls Lifted', link: 'https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026', date: '2026-07-01T00:00:00Z', desc: 'Fable 5 returned to all users globally on July 1 after the US Department of Commerce lifted export controls imposed on June 12. For GoHighLevel-based workflows: you can now use Fable 5 reliably for high-quality automated content and follow-up sequences.' },
-    { title: 'UN AI Governance Summit Calls for Global Controls as AI Shifts to the Battlefield', link: 'https://news.un.org/en/story/2026/07/1167873', date: '2026-07-07T00:00:00Z', desc: 'The first UN Global Dialogue on AI Governance convened in Geneva July 6-7. Secretary-General Guterres called for worldwide controls as civilian AI chips shift to military use. No binding framework yet, but regulatory tightening signals ahead.' },
-    { title: 'OpenAI Delays GPT-5.6 Rollout at U.S. Government Request', link: 'https://www.buildfastwithai.com/blogs/ai-news-today-july-4-2026', date: '2026-07-04T00:00:00Z', desc: 'The US government requested early access and additional oversight before broader availability. Analysts put the public API rollout in the July 7-21 window. Short-term: OpenAI-reliant automations may face capacity constraints.' },
-    { title: 'Chinese AI Providers Now Handle 45% of OpenRouter Traffic, Up from 2% a Year Ago', link: 'https://www.marketingprofs.com/opinions/2026/55197/ai-update-july-3-2026-ai-news-and-views-from-the-past-week', date: '2026-07-03T00:00:00Z', desc: "Z.ai's GLM-5.2 and competing Chinese models now dominate API routing traffic. For subscription SaaS: lower-cost inference means AI-assisted member engagement and follow-up sequences can run at near-zero marginal cost." }
-  ],
-  hvac: [
-    { title: 'Blackstone Acquires Champions Group for $2.5B - Largest HVAC Deal in Recent History', link: 'https://homesteadsp.com/blackstone-hvac-acquisition/', date: '2026-02-01T00:00:00Z', desc: 'Blackstone acquired Champions Group in February, the single largest HVAC services deal on record. Signals that institutional capital views residential HVAC consolidation as mainstream.' },
-    { title: 'VAST Acquires The Whalen Company, Expanding North American Manufacturing', link: 'https://www.achrnews.com/articles/165526-canadian-firm-acquires-hvac-manufacturer', date: '2026-05-01T00:00:00Z', desc: 'VAST acquired Whalen to strengthen manufacturing operations across both the USA and Canada, reinforcing the cross-border consolidation trend in commercial HVAC.' }
-  ],
-  local: [
-    { title: 'RCMP Arrest Impaired Driver on Highway 103 Near Upper Tantallon', link: 'https://www.cbc.ca/news/canada/halifax-regional-municipality', date: '2026-06-27T00:00:00Z', desc: 'An officer conducting proactive patrols on Highway 103 near Upper Tantallon observed a vehicle at excessive speed, resulting in an impaired driving arrest. No injuries reported.' }
-  ]
-};
+// Curated items with confirmed dates
+const CURATED_WORLD = [
+  { title: 'US strikes Iranian railway bridge; Kremlin says Putin open to dialogue with Trump',
+    pubDate: 'Fri, 10 Jul 2026 08:00:00 GMT', link: 'https://usa.news-pravda.com/world/2026/07/10/822822.html',
+    source: 'Pravda USA', desc: 'The US struck a rail link between Iran, China, and Russia after Iranian missile and drone attacks across the Gulf region, including at a US base in Jordan. Russia signalled openness to talks.' },
+  { title: 'Venezuela earthquake death toll rises to 3,889 with 16,740 injured and thousands displaced',
+    pubDate: 'Fri, 10 Jul 2026 08:00:00 GMT', link: 'https://aa.com.tr/en/world/morning-briefing-july-10-2026/3993788',
+    source: 'Anadolu Agency', desc: 'Twin earthquakes in Venezuela have now killed 3,889 people and injured over 16,700. Rescue operations continue as thousands remain displaced across affected regions.' },
+  { title: 'France beats Morocco 2-0 to become first side into 2026 World Cup semifinals',
+    pubDate: 'Fri, 10 Jul 2026 08:00:00 GMT', link: 'https://www.espn.com/soccer/story/_/id/49321840/world-cup-2026-today-blog-10-07-2026-live-updates-news-fixtures-schedule-results-france-morocco-spain-belgium',
+    source: 'ESPN', desc: 'France ended Morocco\'s run in the 2026 World Cup with a 2-0 win, advancing to the semifinals and becoming the first team through in this year\'s tournament.' },
+];
+const CURATED_NHL = [
+  { title: 'Anaheim matches Carlsson offer sheet at $18M/yr -- "Domino Day" ripples across the league',
+    pubDate: 'Thu, 09 Jul 2026 18:00:00 GMT', link: 'https://sports.yahoo.com/articles/nhl-free-agency-frenzy-2026-100042585.html',
+    source: 'Yahoo Sports', desc: 'The Ducks matched Philadelphia\'s $18 million AAV offer sheet on Leo Carlsson by the July 10 deadline. The decision restructures the free agency strategies of teams across the NHL.' },
+];
+const CURATED_AI = [
+  { title: 'GoHighLevel shifts Summer of AI focus to Voice AI in July -- 30-day trial now open',
+    pubDate: 'Wed, 01 Jul 2026 08:00:00 GMT', link: 'https://www.einpresswire.com/article/919306906/gohighlevel-summer-of-ai-discount-window-opens-alongside-conversation-ai-voice-ai-rollout',
+    source: 'EIN Presswire',
+    desc: 'GoHighLevel\'s Summer of AI campaign moves to Voice AI in July, with eligibility-based 30-day trials. Positioned as a call capture supplement, not a full replacement for human handling.',
+    takeaway: 'Activating Voice AI on your HVAC shop sub-accounts during trial adds a compelling automation to the Mainstay Revenue pitch at zero incremental cost this month.' },
+  { title: 'Meta cuts 8,000 jobs in AI restructuring, reassigns 7,000 more to AI-focused teams',
+    pubDate: 'Fri, 03 Jul 2026 08:00:00 GMT', link: 'https://www.crescendo.ai/news/latest-ai-news-and-updates',
+    source: 'Crescendo AI',
+    desc: 'Meta eliminated roughly 10% of its workforce as part of an AI transformation. Thousands more employees were moved into AI product teams rather than cut.',
+    takeaway: 'Platform AI acceleration at Meta means smarter ad targeting tools are coming for Facebook and Instagram -- worth watching for HVAC shop marketing in the Sunbelt.' },
+  { title: "China's Z.ai GLM-5.2 narrows gap with US frontier models at far lower inference cost",
+    pubDate: 'Mon, 06 Jul 2026 08:00:00 GMT', link: 'https://www.crescendo.ai/news/latest-ai-news-and-updates',
+    source: 'Multiple / Crescendo AI',
+    desc: 'The GLM-5.2 model is driving debate about whether China has closed the AI capability gap with Anthropic and OpenAI, offering comparable results at significantly reduced cost.',
+    takeaway: 'Lower inference costs mean AI automations inside GoHighLevel get cheaper over time, improving sub-account margin in the Mainstay Revenue model.' },
+];
 
-async function loadNews() {
-  const SECTIONS = [
-    { id: 'world-body',  rss: 'https://news.google.com/rss/headlines/section/topic/WORLD?hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.world, hours: 24,  quiet: '24 hours', n: 6 },
-    { id: 'leafs-body',  rss: 'https://news.google.com/rss/search?q=Toronto+Maple+Leafs+NHL&hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.leafs, hours: 24, quiet: '24 hours', n: 6 },
-    { id: 'nhl-body',   rss: 'https://news.google.com/rss/search?q=NHL+hockey+2026&hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.nhl, hours: 24,  quiet: '24 hours', n: 8 },
-    { id: 'ai-body',    rss: 'https://news.google.com/rss/search?q=artificial+intelligence+AI+2026&hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.ai, hours: 336, quiet: '2 weeks', n: 8 },
-    { id: 'hvac-body',  rss: 'https://news.google.com/rss/search?q=HVAC+industry+acquisition+2026&hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.hvac, hours: 336, quiet: '2 weeks', n: 8 },
-    { id: 'local-body', rss: 'https://news.google.com/rss/search?q=Halifax+Nova+Scotia+HRM&hl=en-CA&gl=CA&ceid=CA:en', fallback: CURATED.local, hours: 24,  quiet: '24 hours', n: 6 }
-  ];
+// Load all sections
+(async () => {
+  // WORLD
+  const wRss = fresh(await rss('https://news.google.com/rss?hl=en-CA&gl=CA&ceid=CA:en',14), 24);
+  const wSeen = new Set(wRss.map(i=>(i.title||'').toLowerCase().slice(0,30)));
+  CURATED_WORLD.filter(c=>hoursOld(c.pubDate)<=24 && !wSeen.has(c.title.toLowerCase().slice(0,30))).forEach(c=>wRss.push(c));
+  wRss.sort((a,b)=>Date.parse(b.pubDate||0)-Date.parse(a.pubDate||0));
+  render('col-world', wRss, 'Nothing in the last 24 hours.');
 
-  // Load leafs and nhl, exclude overlap: Leafs stories stay in Leafs, NHL filters out Leafs-specific
-  const leafsLiveItems = [];
+  // LEAFS
+  const lfRss = fresh(await rss('https://news.google.com/rss/search?q=Toronto+Maple+Leafs+NHL&hl=en-CA&gl=CA&ceid=CA:en',14), 24)
+    .filter(i=>{ const t=(i.title||'').toLowerCase(); return t.includes('maple leaf')||t.includes('leafs'); });
+  render('col-leafs', lfRss, 'Nothing in the last 24 hours.');
 
-  for (const sec of SECTIONS) {
-    let items = [];
-    try {
-      const live = await fetchRSS(sec.rss, sec.n);
-      items = live.length > 0 ? live : sec.fallback.map(i => ({ ...i, pubDate: i.date }));
-    } catch (_) {
-      items = sec.fallback.map(i => ({ ...i, pubDate: i.date }));
-    }
-    // For NHL: filter out Leafs-specific stories
-    if (sec.id === 'leafs-body') {
-      items.forEach(i => leafsLiveItems.push((i.title || '').toLowerCase()));
-    }
-    if (sec.id === 'nhl-body') {
-      items = items.filter(i => {
-        const t = (i.title || '').toLowerCase();
-        return !t.includes('maple leafs') && !t.includes('toronto leafs') && !leafsLiveItems.some(lt => lt.slice(0,40) === t.slice(0,40));
-      });
-    }
-    renderSection(sec.id, items, sec.hours, sec.quiet);
-  }
-}
-loadNews();
+  // NHL (exclude Leafs stories)
+  const nhRss = fresh(await rss('https://news.google.com/rss/search?q=NHL+hockey+free+agency+trade+2026&hl=en-CA&gl=CA&ceid=CA:en',14), 24)
+    .filter(i=>{ const t=(i.title||'').toLowerCase(); return !t.includes('maple leaf')&&!t.includes('toronto maple'); });
+  const nhSeen = new Set(nhRss.map(i=>(i.title||'').toLowerCase().slice(0,30)));
+  CURATED_NHL.filter(c=>hoursOld(c.pubDate)<=24&&!nhSeen.has(c.title.toLowerCase().slice(0,30))).forEach(c=>nhRss.push(c));
+  nhRss.sort((a,b)=>Date.parse(b.pubDate||0)-Date.parse(a.pubDate||0));
+  render('col-nhl', nhRss, 'Nothing in the last 24 hours.');
+
+  // AI (2 weeks = 336h)
+  const aiRss = fresh(await rss('https://news.google.com/rss/search?q=artificial+intelligence+AI+tech+news&hl=en-CA&gl=CA&ceid=CA:en',14), 336);
+  const aiSeen = new Set(aiRss.map(i=>(i.title||'').toLowerCase().slice(0,30)));
+  CURATED_AI.filter(c=>hoursOld(c.pubDate)<=336&&!aiSeen.has(c.title.toLowerCase().slice(0,30))).forEach(c=>aiRss.push(c));
+  aiRss.sort((a,b)=>Date.parse(b.pubDate||0)-Date.parse(a.pubDate||0));
+  render('col-ai', aiRss, 'Nothing in the last 2 weeks.');
+
+  // HVAC (2 weeks, strict)
+  const hvRss = fresh(await rss('https://news.google.com/rss/search?q=HVAC+heating+cooling+acquisition+merger+manufacturer+2026&hl=en-CA&gl=CA&ceid=CA:en',14), 336)
+    .filter(i=>{ const t=(i.title||'').toLowerCase(); return !t.includes('innovair'); });
+  render('col-hvac', hvRss, 'Nothing in the last 2 weeks.');
+
+  // LOCAL
+  const lcRss = fresh(await rss('https://news.google.com/rss/search?q=Halifax+%22Nova+Scotia%22+HRM+%22St.+Margaret%22+Tantallon&hl=en-CA&gl=CA&ceid=CA:en',14), 24);
+  render('col-local', lcRss.length ? lcRss : [], lcRss.length ? '' : 'Nothing hyperlocal in the last 24 hours. Check halifaxtoday.ca for HRM updates.');
+})();
 </script>
 </body>
 </html>
